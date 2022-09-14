@@ -15,7 +15,7 @@ export default function Backers({ backers }) {
           .toString();
 
         return (
-          <div className="text-gray-800 text-sm bg-gray-100 p-2 mb-4 m-2">
+          <div className="text-gray-800 text-sm bg-gray-100 p-2 mb-4 m-2" key={backer.amount}>
             {amount && account && (
               <>
                 <p className="pt-1">
