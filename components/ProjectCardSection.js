@@ -70,6 +70,14 @@ export default function ProjectCardSection() {
 
         // console.log("Backers: ", backers);
 
+        // const projectStuffs = await crowdfundContract.projects(project.id);
+        const isFinalized = (await crowdfundContract.projects(project.id))[9];
+        const isClaimed = (await crowdfundContract.projects(project.id))[10];
+        const isRefunded = (await crowdfundContract.projects(project.id))[11];
+
+        console.log("Is it finalized? ", isFinalized);
+        // console.log("Project stuffs: ", projectStuffs)
+
         let secondsLeft;
         let status;
 
@@ -77,7 +85,13 @@ export default function ProjectCardSection() {
           Math.floor(Number(new Date().getTime() / 1000)) >
           Number(project.endDay)
         ) {
-          status = "Closed";
+          if (isClaimed) {
+            status = "Successful";
+          } else if (isRefunded) {
+            status = "Unsuccessful";
+          } else {
+            status = "Closed";
+          }
           secondsLeft = 0;
         } else if (
           Number(Math.floor(Number(new Date().getTime() / 1000))) >=
@@ -106,6 +120,9 @@ export default function ProjectCardSection() {
           status,
           percentFunded: percentFunded >= 100 ? 100 : Math.floor(percentFunded),
           backers,
+          isFinalized,
+          isClaimed,
+          isRefunded,
         };
       });
 

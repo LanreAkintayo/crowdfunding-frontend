@@ -9,6 +9,7 @@ import useSWR, { useSWRConfig } from "swr";
 import { RotateLoader, ClipLoader } from "react-spinners";
 import { trackPromise, usePromiseTracker } from "react-promise-tracker";
 import Footer from "../components/Footer";
+import Backers from "../components/Backers";
 // import { getAllProjects } from "../lib/projects";
 
 const supportedTokens = [
@@ -24,6 +25,24 @@ const tokenToAddress = {
   DAI: "0xEC5dCb5Dbf4B114C9d0F65BcCAb49EC54F6A0867",
   XRP: "0xa83575490D7df4E2F47b7D38ef351a2722cA45b9",
 };
+
+const time = ((milliseconds) => {
+  const SEC = 1e3;
+  const MIN = SEC * 60;
+  const HOUR = MIN * 60;
+  const DAY = HOUR * 24;
+  return (time) => {
+    const ms = Math.abs(time);
+    const d = (ms / DAY) | 0;
+    const h = ((ms % DAY) / HOUR) | 0;
+    const m = ((ms % HOUR) / MIN) | 0;
+    const s = ((ms % MIN) / SEC) | 0;
+    return `${time < 0 ? "-" : ""}${d} Days ${h} Hours ${
+      h == 0 ? `${m} Minutes` : ""
+    }`;
+    // ${m}Minute(s) ${s}Second(s)
+  };
+})();
 
 export default function PageInfo({ projectInfo }) {
   const {
@@ -41,16 +60,14 @@ export default function PageInfo({ projectInfo }) {
   const { promiseInProgress } = usePromiseTracker();
   const { mutate } = useSWRConfig();
 
+  const [home, setHome] = useState(true)
+  const [backers, setBackers] = useState(false)
+
   const [projectData, setProjectData] = useState({
     ...projectInfo,
   });
 
-  console.log("Seconds Left: ", projectInfo.secondsLeft);
-  // // 1662521824
-  // console.log("Current Time: ", Math.floor(Number(new Date().getTime() / 1000)))
-  // console.log("End day: ", projectInfo.endDay)
-  // console.log("Start Day: ", projectInfo.startDay)
-
+  
   const chainId = parseInt(chainIdHex);
 
   const length = contractAddresses[chainId]?.length;
@@ -113,6 +130,11 @@ export default function PageInfo({ projectInfo }) {
       (project) => project.id == projectInfo.id
     )[0];
 
+    const isFinalized = (await crowdfundContract.projects(project.id))[9];
+    const isClaimed = (await crowdfundContract.projects(project.id))[10];
+    const isRefunded = (await crowdfundContract.projects(project.id))[11];
+    // console.log("Is it finalized? ", isFinalized)
+
     const amountRaisedInDollars =
       await crowdfundContract.getTotalAmountRaisedInDollars(project.id);
     const backers = await crowdfundContract.getBackers(project.id);
@@ -158,26 +180,11 @@ export default function PageInfo({ projectInfo }) {
       status,
       percentFunded: percentFunded >= 100 ? 100 : Math.floor(percentFunded),
       backers: uniqueBackers,
+      isFinalized,
+      isClaimed,
+      isRefunded
     });
   };
-
-  const time = ((milliseconds) => {
-    const SEC = 1e3;
-    const MIN = SEC * 60;
-    const HOUR = MIN * 60;
-    const DAY = HOUR * 24;
-    return (time) => {
-      const ms = Math.abs(time);
-      const d = (ms / DAY) | 0;
-      const h = ((ms % DAY) / HOUR) | 0;
-      const m = ((ms % HOUR) / MIN) | 0;
-      const s = ((ms % MIN) / SEC) | 0;
-      return `${time < 0 ? "-" : ""}${d} Days ${h} Hours ${
-        h == 0 ? `${m} Minutes` : ""
-      }`;
-      // ${m}Minute(s) ${s}Second(s)
-    };
-  })();
 
   const handleSupport = () => {
     setSupportModalOpen(true);
@@ -306,7 +313,7 @@ export default function PageInfo({ projectInfo }) {
   };
 
   const handleRefund = () => {
-    claim({
+    refund({
       params: {
         abi: abi,
         contractAddress: crowdfundAddress, // specify the networkId
@@ -331,8 +338,7 @@ export default function PageInfo({ projectInfo }) {
     setPledgeAmount(pledgeAmount);
   };
 
-  console.log("This is the project data: ", projectData)
-
+ 
   return (
     <>
       <section>
@@ -350,26 +356,62 @@ export default function PageInfo({ projectInfo }) {
         </p>
         <div className="flex flex-col md:flex-row mt-11">
           <div className="flex flex-col md:w-7/12 px-8">
-            <div className="flex justify-between text-sm lg:text-xl text-gray-500 my-3 py-3 border-b-2">
-              <button>Home</button>
-              <button>Backers</button>
-              <button>Updates</button>
-              <button>Comments</button>
-            </div>
-            <div className="w-full h-96">
-              <img
-                alt="..."
-                src={projectData.projectImageUrl}
-                className="object-cover w-full h-full"
-              />
-            </div>
+            {projectData.isClaimed && (
+              <div className="p-2 bg-green-300 text-green-700">
+                Project was successful
+              </div>
+            )}
+            {projectData.isRefunded && (
+              <div className="p-2 bg-red-300 text-red-700">
+                Project was unsuccessful
+              </div>
+            )}
 
-            <div className="py-4">
-              <h1 className=" text-xl md:text-3xl text-gray-800 pt-10 pb-4">
-                Why do I need this fund?
-              </h1>
-              <p className="md:text-base text-sm">{projectData.projectNote}</p>
+            <div className="flex justify-between text-sm lg:text-xl text-gray-500 my-3 py-3 border-b-2">
+              <button
+                className="hover:text-gray-800"
+                onClick={() => {
+                  setHome(true);
+                  setBackers(false);
+                }}
+              >
+                Home
+              </button>
+              <button
+                className="hover:text-gray-800"
+                onClick={() => {
+                  setHome(false);
+                  setBackers(true);
+                }}
+              >
+                Backers
+              </button>
+              <button className="hover:text-gray-800">Updates</button>
+              <button className="hover:text-gray-800">Comments</button>
             </div>
+            {home && <div>
+              <div className="w-full h-96">
+                <img
+                  alt="..."
+                  src={projectData.projectImageUrl}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+
+              <div className="py-4">
+                <h1 className=" text-xl md:text-3xl text-gray-800 pt-10 pb-4">
+                  Why do I need this fund?
+                </h1>
+                <p className="md:text-base text-sm">
+                  {projectData.projectNote}
+                </p>
+              </div>
+            </div>}
+
+            {backers && projectData.backers && <div>
+              <Backers backers={projectData.backers}/>
+            </div>}
+            
           </div>
           <div className="mx-8 lg:w-5/12 lg:px-8">
             <div className="bg-neutral-300 h-4 dark:bg-gray-700">
@@ -415,7 +457,7 @@ export default function PageInfo({ projectInfo }) {
             )}
 
             {projectData.status == "Closed" &&
-              projectData.isFinalized == "false" &&
+              !projectData.isFinalized &&
               Number(projectData.amountRaisedInDollars) <
                 Number(projectData.goal) && (
                 <button
@@ -425,7 +467,7 @@ export default function PageInfo({ projectInfo }) {
                     isFetchingRefund || isLoadingRefund || promiseInProgress
                   }
                 >
-                  {isFetchingClaim || isLoadingClaim || promiseInProgress ? (
+                  {isFetchingRefund || isLoadingRefund || promiseInProgress ? (
                     <div className="flex flex-col w-full justify-between bg-red-300 rounded-md items-center px-3 py-3">
                       <div className="flex items-center">
                         <ClipLoader color="#990000" loading="true" size={30} />
@@ -446,7 +488,7 @@ export default function PageInfo({ projectInfo }) {
               )}
 
             {projectData.status == "Closed" &&
-              projectData.isFinalized == "false" &&
+              !projectData.isFinalized &&
               Number(projectData.amountRaisedInDollars) >=
                 Number(projectData.goal) && (
                 <button
@@ -485,9 +527,9 @@ export default function PageInfo({ projectInfo }) {
               </button>
             )}
 
-            {projectData.isFinalized == "true" && (
+            {projectData.isFinalized && (
               <button
-                className="my-6 w-full rounded-md p-2 disabled:opacity-50 bg-yellow-200 text-yellow-800"
+                className="my-6 w-full cursor-not-allowed rounded-md p-2 disabled:opacity-50 bg-yellow-200 text-yellow-800"
                 disabled={true}
               >
                 Project is Closed
@@ -520,8 +562,11 @@ export default function PageInfo({ projectInfo }) {
 export async function getServerSideProps(context) {
   const query = context.query;
 
+  // console.log("query.isFinalized: ", query.isFinalized)
   const backers = JSON.parse(query.backers);
-
+  const isFinalized = JSON.parse(query.isFinalized);
+  const isClaimed = JSON.parse(query.isClaimed);
+  const isRefunded = JSON.parse(query.isRefunded);
   // const availableAmountInContract = JSON.parse(query.availableAmountInContract);
   // const totalBorrowedInContract = JSON.parse(query.totalBorrowedInContract);
   // const totalSuppliedInContract = JSON.parse(query.totalSuppliedInContract);
@@ -532,6 +577,9 @@ export async function getServerSideProps(context) {
   const projectInfo = {
     ...query,
     backers,
+    isFinalized,
+    isClaimed,
+    isRefunded
   };
 
   return {

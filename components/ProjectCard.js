@@ -24,13 +24,13 @@ export default function ProjectCard({ projectInfo }) {
     color = "bg-red-600";
   }
 
-  if (projectInfo.status == "Active"){
+  if (["Active", "Successful"].includes(projectInfo.status)){
     statusBgColor = "bg-green-200"
     statusTextColor = "text-green-700"
   } else if (projectInfo.status == "Pending"){
     statusBgColor = "bg-yellow-200"
     statusTextColor="text-yellow-700"
-  } else if (projectInfo.status == "Closed"){
+  } else if (["Closed", "Unsuccessful"].includes(projectInfo.status)){
     statusBgColor = "bg-red-200"
     statusTextColor = "text-red-700"
   }

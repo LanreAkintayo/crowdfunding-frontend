@@ -9,6 +9,7 @@ import { ethers } from "ethers";
 import { RotateLoader, ClipLoader } from "react-spinners";
 import { useNotification } from "web3uikit";
 import { usePromiseTracker, trackPromise } from "react-promise-tracker";
+import { sDuration } from "../utils/helper";
 
 import "react-datepicker/dist/react-datepicker.css";
 // import DatePicker from "sassy-datepicker";
@@ -19,6 +20,10 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 const projectSecret = process.env.NEXT_PUBLIC_API_SECRET_KEY;
+
+
+console.log(projectId)
+console.log(projectSecret)
 
 const auth =
   "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
@@ -172,7 +177,8 @@ export default function Launch() {
     const startDayInSeconds = Math.floor(
       projectInfo.launchDate.getTime() / 1000
     );
-
+    
+    const duration = sDuration.minutes(duration)
     console.log(startDayInSeconds);
 
     try {
@@ -185,9 +191,9 @@ export default function Launch() {
           contractAddress: crowdfundAddress, // specify the networkId
           functionName: "launch",
           params: {
-            // startDay: startDayInSeconds,
-            startDay: 1662728516,
-            duration: projectInfo.duration,
+            startDay: startDayInSeconds,
+            // startDay: 1662728516,
+            duration,
             // duration: "1662813871",
             goal: ethers.utils.parseEther(goalInDollars),
             projectTitle: projectInfo.title,
@@ -464,7 +470,7 @@ export default function Launch() {
           <div className="md:w-7/12 md:px-11 ">
             <div>
               <h1 className="md:text-auto text-sm">
-                Enter Number of days (1 - 60){" "}
+                Enter number of minutes (1 - 60){" "}
               </h1>
 
               <input
