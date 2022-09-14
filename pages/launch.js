@@ -178,8 +178,10 @@ export default function Launch() {
       projectInfo.launchDate.getTime() / 1000
     );
     
-    const duration = sDuration.minutes(duration)
-    console.log(startDayInSeconds);
+    const duration = sDuration.minutes(Number(projectInfo.duration))
+
+    console.log("duration is", duration)
+    // console.log(startDayInSeconds);
 
     try {
       const uploadedImage = await trackPromise(client.add(imageFile));

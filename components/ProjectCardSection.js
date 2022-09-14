@@ -67,7 +67,15 @@ export default function ProjectCardSection() {
         const amountRaisedInDollars =
           await crowdfundContract.getTotalAmountRaisedInDollars(project.id);
         const backers = await crowdfundContract.getBackers(project.id);
-
+        const editedBackers = backers.map((backer) => {
+          console.log("Returning .............", [
+            backer[0],
+            backer[1],
+            backer[2].toString(),
+          ]);
+          return [backer[0], backer[1], backer[2].toString()];
+        });
+    
         // console.log("Backers: ", backers);
 
         // const projectStuffs = await crowdfundContract.projects(project.id);
@@ -119,7 +127,7 @@ export default function ProjectCardSection() {
           secondsLeft,
           status,
           percentFunded: percentFunded >= 100 ? 100 : Math.floor(percentFunded),
-          backers,
+          backers: editedBackers,
           isFinalized,
           isClaimed,
           isRefunded,

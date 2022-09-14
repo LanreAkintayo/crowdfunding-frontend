@@ -60,14 +60,13 @@ export default function PageInfo({ projectInfo }) {
   const { promiseInProgress } = usePromiseTracker();
   const { mutate } = useSWRConfig();
 
-  const [home, setHome] = useState(true)
-  const [backers, setBackers] = useState(false)
+  const [home, setHome] = useState(true);
+  const [backers, setBackers] = useState(false);
 
   const [projectData, setProjectData] = useState({
     ...projectInfo,
   });
 
-  
   const chainId = parseInt(chainIdHex);
 
   const length = contractAddresses[chainId]?.length;
@@ -138,11 +137,16 @@ export default function PageInfo({ projectInfo }) {
     const amountRaisedInDollars =
       await crowdfundContract.getTotalAmountRaisedInDollars(project.id);
     const backers = await crowdfundContract.getBackers(project.id);
-    const backersAddress = backers.map((backer) => {
-      return backer[0];
+    const editedBackers = backers.map((backer) => {
+      console.log("Returning .............", [
+        backer[0],
+        backer[1],
+        backer[2].toString(),
+      ]);
+      return [backer[0], backer[1], backer[2].toString()];
     });
 
-    const uniqueBackers = [...new Set(backersAddress)];
+    // const uniqueBackers = [...new Set(backersAddress)];
     // console.log("Unique backers: ", uniqueBackers)
 
     let secondsLeft;
@@ -179,10 +183,10 @@ export default function PageInfo({ projectInfo }) {
       secondsLeft,
       status,
       percentFunded: percentFunded >= 100 ? 100 : Math.floor(percentFunded),
-      backers: uniqueBackers,
+      backers: editedBackers,
       isFinalized,
       isClaimed,
-      isRefunded
+      isRefunded,
     });
   };
 
@@ -338,7 +342,6 @@ export default function PageInfo({ projectInfo }) {
     setPledgeAmount(pledgeAmount);
   };
 
- 
   return (
     <>
       <section>
@@ -389,29 +392,32 @@ export default function PageInfo({ projectInfo }) {
               <button className="hover:text-gray-800">Updates</button>
               <button className="hover:text-gray-800">Comments</button>
             </div>
-            {home && <div>
-              <div className="w-full h-96">
-                <img
-                  alt="..."
-                  src={projectData.projectImageUrl}
-                  className="object-cover w-full h-full"
-                />
-              </div>
+            {home && (
+              <div>
+                <div className="w-full h-96">
+                  <img
+                    alt="..."
+                    src={projectData.projectImageUrl}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
 
-              <div className="py-4">
-                <h1 className=" text-xl md:text-3xl text-gray-800 pt-10 pb-4">
-                  Why do I need this fund?
-                </h1>
-                <p className="md:text-base text-sm">
-                  {projectData.projectNote}
-                </p>
+                <div className="py-4">
+                  <h1 className=" text-xl md:text-3xl text-gray-800 pt-10 pb-4">
+                    Why do I need this fund?
+                  </h1>
+                  <p className="md:text-base text-sm">
+                    {projectData.projectNote}
+                  </p>
+                </div>
               </div>
-            </div>}
+            )}
 
-            {backers && projectData.backers && <div>
-              <Backers backers={projectData.backers}/>
-            </div>}
-            
+            {backers && projectData.backers && (
+              <div>
+                <Backers backers={projectData.backers} />
+              </div>
+            )}
           </div>
           <div className="mx-8 lg:w-5/12 lg:px-8">
             <div className="bg-neutral-300 h-4 dark:bg-gray-700">
@@ -579,7 +585,7 @@ export async function getServerSideProps(context) {
     backers,
     isFinalized,
     isClaimed,
-    isRefunded
+    isRefunded,
   };
 
   return {
