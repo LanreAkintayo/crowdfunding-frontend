@@ -1,6 +1,12 @@
 import Dropdown from "./Dropdown";
 import { RotateLoader, ClipLoader } from "react-spinners";
 import { usePromiseTracker } from "react-promise-tracker";
+import { contractAddresses, abi, erc20Abi, wbnbAbi } from "../constants";
+import { tokenToAddress, fromWei } from "../utils/helper";
+import {useState} from "react"
+import { useMoralis, useWeb3Contract } from "react-moralis";
+import {ethers} from "ethers"
+
 
 export default function SupportModal({
   handleCloseSupportModal,
@@ -11,14 +17,52 @@ export default function SupportModal({
   handlePledge,
   isFetching,
   isLoading,
+  currentBalance
 }) {
   // const handleOnChange = (event) => {
   //   const pledgeAmount = event.target.value
   const { promiseInProgress } = usePromiseTracker();
+  const {
+    Moralis,
+    isWeb3Enabled,
+    chainId: chainIdHex,
+    enableWeb3,
+    account,
+  } = useMoralis();
+  const chainId = parseInt(chainIdHex);
+
+  const length = contractAddresses[chainId]?.length;
+  
+
+
+  // const handleMax = async (tokenName) => {
+
+  //   console.log(tokenName)
+  //   console.log(selectedToken)
+  //   const tokenAddress = tokenToAddress[selectedToken.name]
+  //   // const tokeknAbi = ["BUSD", "DAI", "XRP"].includes(selectedTokenName) 
+    
+  //   const provider = await enableWeb3();
+
+
+  //   const tokenContract = new ethers.Contract(
+  //     tokenAddress,
+  //     erc20Abi,
+  //     provider
+  //   );
+
+  //   const balance = await tokenContract.balanceOf(account)
+  //   const dollarUSLocale = Intl.NumberFormat("en-US");
+  //   const formattedBalance = dollarUSLocale
+  //   .format(fromWei(balance.toString()))
+  //   .toString();
+
+  //   setCurrentBalance(formattedBalance)
+  // }
   // }
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity">
+    <div className="fixed inset-0 bg-gray-900 z-50 bg-opacity-75 transition-opacity">
       <div
         tabIndex="-1"
         className="inline-block align-bottom h-5/6  rounded-lg w-full scrollbar-hide text-left outline-none overflow-auto transform max-w-sm mt-16 sm:max-w-md"
@@ -75,9 +119,9 @@ export default function SupportModal({
                     placeholder="0.00"
                     className="w-80 block pl-2 font-medium text-lg focus:outline-none rounded-md"
                   />
-                  <p className="self-end text-sm text-gray-600 font-medium">
-                    MAX
-                  </p>
+                  <button className="self-end text-sm text-gray-600 font-medium" onClick={() => handleMax(selectedToken)}>
+                    MAX: {currentBalance} {selectedToken.name} 
+                  </button>
                 </div>
                 {!isValidAmount && (
                   <p className="text-red-700 test-sm">
@@ -93,7 +137,7 @@ export default function SupportModal({
               <button
                 className={`p-2 w-full text-green-800 text-center rounded-md font-medium text-xl disabled:cursor-not-allowed disabled:opacity-50`}
                 onClick={handlePledge}
-                disabled={isFetching || isLoading || promiseInProgress}
+                disabled={isFetching || isLoading || promiseInProgress || !isValidAmount || !selectedToken}
               >
                 {(isFetching || isLoading || promiseInProgress) ? (
                   <div className="flex flex-col w-full justify-between bg-green-300 rounded-md items-center px-3 py-3">

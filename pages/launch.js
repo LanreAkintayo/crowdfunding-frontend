@@ -133,7 +133,7 @@ export default function Launch() {
       setIsValidDuration(() => {
         if (
           /[^0-9]/g.test(duration.toString()) ||
-          Number(duration) > 60 ||
+          Number(duration) > 1000 ||
           Number(duration) < 1
         ) {
           return false;
@@ -472,7 +472,7 @@ export default function Launch() {
           <div className="md:w-7/12 md:px-11 ">
             <div>
               <h1 className="md:text-auto text-sm">
-                Enter number of minutes (1 - 60){" "}
+                Enter number of minutes (1 - 1000){" "}
               </h1>
 
               <input
@@ -485,7 +485,7 @@ export default function Launch() {
               />
               {!isValidDuration && (
                 <p className="text-red-700 md:text-sm text-xs">
-                  <small>Duration should be within 1 and 60</small>
+                  <small>Duration should be within 1 and 1000</small>
                 </p>
               )}
             </div>

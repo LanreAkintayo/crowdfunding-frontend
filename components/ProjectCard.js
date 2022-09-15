@@ -24,36 +24,39 @@ export default function ProjectCard({ projectInfo }) {
     color = "bg-red-600";
   }
 
-  if (["Active", "Successful"].includes(projectInfo.status)){
-    statusBgColor = "bg-green-200"
-    statusTextColor = "text-green-700"
-  } else if (projectInfo.status == "Pending"){
-    statusBgColor = "bg-yellow-200"
-    statusTextColor="text-yellow-700"
-  } else if (["Closed", "Unsuccessful"].includes(projectInfo.status)){
-    statusBgColor = "bg-red-200"
-    statusTextColor = "text-red-700"
+  if (["Active", "Successful"].includes(projectInfo.status)) {
+    statusBgColor = "bg-green-200";
+    statusTextColor = "text-green-700";
+  } else if (projectInfo.status == "Pending") {
+    statusBgColor = "bg-yellow-200";
+    statusTextColor = "text-yellow-700";
+  } else if (["Closed", "Unsuccessful"].includes(projectInfo.status)) {
+    statusBgColor = "bg-red-200";
+    statusTextColor = "text-red-700";
   }
 
   let dollarUSLocale = Intl.NumberFormat("en-US");
 
   const formattedGoal = dollarUSLocale.format(goal).toString();
   return (
-    <>
+    <div className="my-3">
       <Link
         href={{
           pathname: `/${projectInfo.projectTitle}`,
           query: {
             ...projectInfo,
-            backers: JSON.stringify(projectInfo.backers)
-
+            backers: JSON.stringify(projectInfo.backers),
           },
           // the data
         }}
         as={`/${projectInfo.projectTitle}`}
       >
-        <div className="mx-3 relative w-auto h-auto mb-5 lg:mb-0 bg-white-200 shadow-lg cursor-pointer">
-        <p className={`px-2 py-1 absolute left-1 top-1 rounded-md ${statusBgColor} ${statusTextColor}`}><small>{projectInfo.status}</small></p>
+        <div className="mx-3 my-3 relative w-auto h-full mb-5 lg:mb-0 bg-white-200 shadow-lg cursor-pointer">
+          <p
+            className={`px-2 py-1 absolute left-1 top-1 rounded-md ${statusBgColor} ${statusTextColor}`}
+          >
+            <small>{projectInfo.status}</small>
+          </p>
           <div className="w-full h-56 ">
             <img
               alt="..."
@@ -67,17 +70,19 @@ export default function ProjectCard({ projectInfo }) {
               style={{ width: `${projectInfo.percentFunded}%` }}
             ></div>
           </div>
-          <div className=" px-2">
+          <div className=" px-2 py-3">
             <h1 className="text-xl text-green-900 py-3">
               {projectInfo.projectTitle}
             </h1>
-            <p className="text-sm text-gray-800">{projectInfo.projectNote}</p>
-            <p className="py-4 text-green-900">
-              {projectInfo.percentFunded}% of ${formattedGoal} Raised{" "}
-            </p>
+            <p className="text-sm text-gray-800">{projectInfo.projectNote.toString().substring(0, 200)}</p>
+            {!["Successful", "Unsuccessful"].includes(projectInfo.status) && (
+              <p className="pt-4 text-green-900">
+                {projectInfo.percentFunded}% of ${formattedGoal} Raised{" "}
+              </p>
+            ) }
           </div>
         </div>
       </Link>
-    </>
+    </div>
   );
 }

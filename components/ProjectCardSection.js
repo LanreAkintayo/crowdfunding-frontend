@@ -75,7 +75,7 @@ export default function ProjectCardSection() {
           ]);
           return [backer[0], backer[1], backer[2].toString()];
         });
-    
+
         // console.log("Backers: ", backers);
 
         // const projectStuffs = await crowdfundContract.projects(project.id);
@@ -95,7 +95,7 @@ export default function ProjectCardSection() {
         ) {
           if (isClaimed) {
             status = "Successful";
-          } else if (isRefunded) {
+          } else if (isRefunded || Number(amountRaisedInDollars) == 0) {
             status = "Unsuccessful";
           } else {
             status = "Closed";

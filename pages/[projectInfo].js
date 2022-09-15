@@ -2,7 +2,12 @@ import Header from "../components/Header";
 import SupportModal from "../components/SupportModal";
 import { ethers } from "ethers";
 import { useState } from "react";
-import { useMoralis, useWeb3Contract } from "react-moralis";
+import {
+  useMoralis,
+  useWeb3Contract,
+  useChain,
+  useNativeBalance,
+} from "react-moralis";
 import { contractAddresses, abi, erc20Abi, wbnbAbi } from "../constants";
 import { useNotification } from "web3uikit";
 import useSWR, { useSWRConfig } from "swr";
@@ -10,6 +15,7 @@ import { RotateLoader, ClipLoader } from "react-spinners";
 import { trackPromise, usePromiseTracker } from "react-promise-tracker";
 import Footer from "../components/Footer";
 import Backers from "../components/Backers";
+import { toWei, fromWei, tokenToAddress } from "../utils/helper";
 // import { getAllProjects } from "../lib/projects";
 
 const supportedTokens = [
@@ -19,12 +25,12 @@ const supportedTokens = [
   { name: "XRP", src: "/xrp.png" },
 ];
 
-const tokenToAddress = {
-  BNB: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
-  BUSD: "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee",
-  DAI: "0xEC5dCb5Dbf4B114C9d0F65BcCAb49EC54F6A0867",
-  XRP: "0xa83575490D7df4E2F47b7D38ef351a2722cA45b9",
-};
+// const tokenToAddress = {
+//   BNB: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+//   BUSD: "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee",
+//   DAI: "0xEC5dCb5Dbf4B114C9d0F65BcCAb49EC54F6A0867",
+//   XRP: "0xa83575490D7df4E2F47b7D38ef351a2722cA45b9",
+// };
 
 const time = ((milliseconds) => {
   const SEC = 1e3;
@@ -52,13 +58,15 @@ export default function PageInfo({ projectInfo }) {
     enableWeb3,
     account,
   } = useMoralis();
+
   const [supportModalOpen, setSupportModalOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState({});
   const [pledgeAmount, setPledgeAmount] = useState();
-  const [isValidAmount, setIsValidAmount] = useState(true);
+  const [isValidAmount, setIsValidAmount] = useState(false);
   const dispatch = useNotification();
   const { promiseInProgress } = usePromiseTracker();
   const { mutate } = useSWRConfig();
+  const [currentBalance, setCurrentBalance] = useState("");
 
   const [home, setHome] = useState(true);
   const [backers, setBackers] = useState(false);
@@ -146,6 +154,8 @@ export default function PageInfo({ projectInfo }) {
       return [backer[0], backer[1], backer[2].toString()];
     });
 
+    // console.log(ethers)
+
     // const uniqueBackers = [...new Set(backersAddress)];
     // console.log("Unique backers: ", uniqueBackers)
 
@@ -196,11 +206,37 @@ export default function PageInfo({ projectInfo }) {
 
   const handleCloseSupportModal = () => {
     setSupportModalOpen(false);
+    setSelectedToken({});
   };
 
-  const handleSelectToken = (name, src) => {
-    console.log("Token Name: ", name);
-    console.log("Token Src: ", src);
+  const handleSelectToken = async (name, src) => {
+    const tokenAddress = tokenToAddress[name];
+
+    const provider = await enableWeb3();
+
+    let balance;
+    if (["BUSD", "XRP", "DAI"].includes(name)) {
+      const tokenContract = new ethers.Contract(
+        tokenAddress,
+        erc20Abi,
+        provider
+      );
+
+      balance = await tokenContract.balanceOf(account);
+    } else {
+      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      console.log("Web3Provider: ", web3Provider);
+      balance = (await web3Provider.getBalance(account)).toString();
+    }
+
+    const dollarUSLocale = Intl.NumberFormat("en-US");
+    const formattedBalance = dollarUSLocale
+      .format(fromWei(balance.toString()))
+      .toString();
+
+    setCurrentBalance(formattedBalance);
+
     setSelectedToken({ name, src });
   };
 
@@ -333,14 +369,25 @@ export default function PageInfo({ projectInfo }) {
 
   const handleOnChange = (event) => {
     const pledgeAmount = event.target.value;
+    console.log("This is the pledge amount: ", pledgeAmount);
     setIsValidAmount(() => {
-      if (/^\$?\d+(,\d{3})*(\.\d*)?$/.test(pledgeAmount.toString())) {
+      if (
+        /^\$?\d+(,\d{3})*(\.\d*)?$/.test(pledgeAmount.toString()) &&
+        Number(pledgeAmount) != 0
+      ) {
         return true;
       }
       return false;
     });
     setPledgeAmount(pledgeAmount);
   };
+
+  console.log(
+    Number(projectData.amountRaisedInDollars) == 0 &&
+      projectData.status == "Unsuccessful" &&
+      !projectData.isClaimed &&
+      !projectData.isRefunded
+  );
 
   return (
     <>
@@ -383,8 +430,10 @@ export default function PageInfo({ projectInfo }) {
               <button
                 className="hover:text-gray-800"
                 onClick={() => {
-                  setHome(false);
-                  setBackers(true);
+                  if (!projectData.isClaimed && !projectData.isRefunded) {
+                    setHome(false);
+                    setBackers(true);
+                  }
                 }}
               >
                 Backers
@@ -400,6 +449,18 @@ export default function PageInfo({ projectInfo }) {
                     src={projectData.projectImageUrl}
                     className="object-cover w-full h-full"
                   />
+                  <p className="text-end py-2">
+                    <small>
+                      <span className="text-gray-500">Owner</span>:{" "}
+                      {projectData.owner.toString().substring(0, 7)}...
+                      {projectData.owner
+                        .toString()
+                        .substring(
+                          projectData.owner.toString().length - 8,
+                          projectData.owner.toString().length
+                        )}
+                    </small>
+                  </p>
                 </div>
 
                 <div className="py-4">
@@ -461,6 +522,32 @@ export default function PageInfo({ projectInfo }) {
                 Support this Project
               </button>
             )}
+            {/* {if (Number(projectData.amountRaisedInDollars) <
+                Number(projectData.goal)){
+                  if (Number(projectData.amountRaisedInDollars) == 0){
+                    return (  
+                      <button
+                        className="my-6 w-full cursor-not-allowed rounded-md p-2 disabled:opacity-50 bg-yellow-200 text-yellow-800"
+                        disabled={true}
+                      >
+                        Project is Closed
+                      </button>
+                    )
+                  } else{
+
+                  }
+                }} */}
+            {Number(projectData.amountRaisedInDollars) == 0 &&
+              projectData.status == "Unsuccessful" &&
+              !projectData.isClaimed &&
+              !projectData.isRefunded && (
+                <button
+                  className="my-6 w-full cursor-not-allowed rounded-md p-2 disabled:opacity-50 bg-yellow-200 text-yellow-800"
+                  disabled={true}
+                >
+                  Project is Closed
+                </button>
+              )}
 
             {projectData.status == "Closed" &&
               !projectData.isFinalized &&
@@ -551,6 +638,7 @@ export default function PageInfo({ projectInfo }) {
             handleCloseSupportModal={handleCloseSupportModal}
             handleSelectToken={handleSelectToken}
             selectedToken={selectedToken}
+            currentBalance={currentBalance}
             handleOnChange={handleOnChange}
             isValidAmount={isValidAmount}
             handlePledge={handlePledge}
