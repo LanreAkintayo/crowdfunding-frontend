@@ -119,9 +119,9 @@ export default function SupportModal({
                     placeholder="0.00"
                     className="w-80 block pl-2 font-medium text-lg focus:outline-none rounded-md"
                   />
-                  <button className="self-end text-sm text-gray-600 font-medium" onClick={() => handleMax(selectedToken)}>
+                  <p className="self-end text-sm text-gray-600 font-medium">
                     MAX: {currentBalance} {selectedToken.name} 
-                  </button>
+                  </p>
                 </div>
                 {!isValidAmount && (
                   <p className="text-red-700 test-sm">
