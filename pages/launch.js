@@ -74,6 +74,9 @@ export default function Launch() {
   const [isValidLaunchDate, setIsValidLaunchDate] = useState(true);
   const [isValidGoal, setIsValidGoal] = useState(true);
 
+  const [launchText, setLaunchText] = useState("Publish Your Project")
+  const [isLaunching, setIsLaunching] = useState(false)
+
   useEffect(() => {
     console.log("Here is the current url: ", currentUrl);
   }, [currentUrl]);
@@ -173,6 +176,9 @@ export default function Launch() {
   // }, [project]);
 
   const handleLaunch = async () => {
+    setIsLaunching(true)
+    setLaunchText("Publishing Project")
+
     const goalInDollars = projectInfo.goal.replace(/[^0-9]/g, "");
     const startDayInSeconds = Math.floor(
       projectInfo.launchDate.getTime() / 1000
@@ -184,8 +190,11 @@ export default function Launch() {
     // console.log(startDayInSeconds);
 
     try {
+      setLaunchText("Uploading data to IPFS")
       const uploadedImage = await trackPromise(client.add(imageFile));
       const url = `https://cloudflare-ipfs.com/ipfs/${uploadedImage.path}`;
+
+      setLaunchText("Publishing Project")
 
       launch({
         params: {
@@ -242,6 +251,8 @@ export default function Launch() {
     console.log("Success transaction: ", tx);
     await trackPromise(tx.wait(1));
     // updateUIValues()
+    setLaunchText("Publish Your Project")
+    setIsLaunching(false)
     dispatch({
       type: "success",
       message: "Transaction Completed!",
@@ -252,6 +263,9 @@ export default function Launch() {
 
   const handleFailure = async (error) => {
     console.log("Error: ", error);
+    setLaunchText("Publish Your Project")
+    setIsLaunching(false)
+
     dispatch({
       type: "error",
       message: "Transation Failed",
@@ -532,20 +546,18 @@ export default function Launch() {
           <button
             className="flex flex-col w-full items-center my-5 mb-14 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleLaunch}
-            disabled={isFetching || isLoading || promiseInProgress}
+            disabled={isLaunching}
           >
-            {isFetching || isLoading || promiseInProgress ? (
+            {isLaunching ? (
               <div className="flex bg-green-300 text-green-800 rounded-md items-center px-3 py-3">
                 <ClipLoader color="#004d00" loading="true" size={30} />
                 <p className="ml-2">
-                  {promiseInProgress
-                    ? "Wait a few Seconds"
-                    : "Launching Project"}
+                 {launchText}
                 </p>
               </div>
             ) : (
               <div className="flex bg-green-300 text-green-800 rounded-md items-center px-3 py-3">
-                <p className="">Launch Your Project</p>
+                <p className="">{launchText}</p>
               </div>
             )}
           </button>

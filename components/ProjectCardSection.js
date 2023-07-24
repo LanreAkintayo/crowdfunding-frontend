@@ -63,6 +63,8 @@ export default function ProjectCardSection() {
       );
       // const projects = await crowdfundContract.getAllProjects();
 
+      console.log("Get all projects::: ", projects)
+
       const allProjects = projects.map(async (project) => {
         const amountRaisedInDollars =
           await crowdfundContract.getTotalAmountRaisedInDollars(project.id);
@@ -136,10 +138,12 @@ export default function ProjectCardSection() {
 
       const resolved = await Promise.all(allProjects);
 
-      // console.log("resolved: ", resolved);
+      console.log("resolved::::::::::::: ", resolved);
       return resolved.reverse();
     }
   );
+
+  console.log("All Projects::::::::::::::::: ",allProjects)
 
   return (
     <section className=" px-5 lg:px-5 w-full">

@@ -655,8 +655,11 @@ export default function PageInfo({ projectInfo }) {
 
 export async function getServerSideProps(context) {
   const query = context.query;
+  // console.log(context)
+
 
   // console.log("query.isFinalized: ", query.isFinalized)
+  console.log("Query backers:::::: ", query.backers)
   const backers = JSON.parse(query.backers);
   const isFinalized = JSON.parse(query.isFinalized);
   const isClaimed = JSON.parse(query.isClaimed);
