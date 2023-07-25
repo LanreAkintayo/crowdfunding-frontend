@@ -60,7 +60,7 @@ export default function Footer() {
           </a>
         </div>
       </div>
-      <p className="mt-4 text-sm">© 2022 Made by LarryCodes</p>
+      <p className="mt-4 text-sm">© 2023 Made by LarryCodes</p>
     </footer>
   );
 }

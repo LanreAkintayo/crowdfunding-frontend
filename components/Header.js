@@ -9,6 +9,8 @@ import { useMoralis, useWeb3Contract, useChain } from "react-moralis";
 import { abi } from "../constants";
 import { BigNumber, ethers } from 'ethers';
 import { useRouter } from 'next/router';
+import { FaBars, FaTimes } from "react-icons/fa";
+
 
 
 const useMediaQuery = (width) => {
@@ -84,33 +86,33 @@ export default function Header() {
             collapsed={collapsed}
           >
             <div
-              className="px-4 pt-4 w-full text-end cursor-pointer text-xl"
+              className="px-4 pt-4 w-full flex justify-end text-end cursor-pointer text-xl"
               onClick={handleSidebar}
             >
-              X
+              <FaTimes/>
             </div>
             <Menu iconShape="square">
               <div className="text-xl text-white hover:text-green-700">
                 <MenuItem>
                 <Link href="/">
-                  <a className={`text-white font-semibold ${currentUrl == "/" && "border-b-2 border-orange-700"} hover:text-orange-500 sm:text-xl text-lg`}>
+                  <p className={`text-white font-semibold ${currentUrl == "/" && "border-b-2 border-orange-700"} hover:text-orange-500 sm:text-xl text-lg`}>
                     Home
-                  </a>
+                  </p>
                 </Link>
                 </MenuItem>
               </div>
               <MenuItem>
               <Link href="/projects">
-                  <a className={`text-white ${currentUrl == "/projects" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg`}>
+                  <p className={`text-white ${currentUrl == "/projects" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg`}>
                     Projects
-                  </a>
+                  </p>
                 </Link>
               </MenuItem>
               <MenuItem>
               <Link href="/launch">
-                  <a className={`w-full text-white ${currentUrl == "/launch" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg `}>
+                  <p className={`w-full text-white ${currentUrl == "/launch" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg `}>
                     Get Funded
-                  </a>
+                  </p>
                 </Link>
               </MenuItem>
             </Menu>
@@ -169,11 +171,13 @@ export default function Header() {
                 className="w-8 h-8 text-white hover:text-green-500 cursor-pointer"
                 onClick={handleSidebar}
               >
-                <img
+                {/* <img
                   alt="..."
                   src="./menubar.svg"
                   className="object-cover w-full h-full cursor-pointer hover:text-green-500"
-                />
+                /> */}
+
+<FaBars className="mr-3 w-9 h-9 bg-orange-100 rounded-full text-orange-800 p-2"/>
               </div>
             )}
           </div>
