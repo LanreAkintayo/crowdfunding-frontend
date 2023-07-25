@@ -82,7 +82,7 @@ export default function Home() {
 
             </div>
             <div className="ft:col-span-5  ">
-              <img src="/animated_clip_art.gif" alt="crowdfund clip art" width={800} height={800}/>
+              <img src="/homepage_clip_art.svg" alt="crowdfund clip art" width={800} height={800}/>
             </div>
          
           </div>
