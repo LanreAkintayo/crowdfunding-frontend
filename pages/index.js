@@ -26,16 +26,16 @@ export default function Home() {
       <section>
         <Header />
 
-        <div className=" w-full h-screen">
-          <div className="w-full h-full flex flex-col justify-center ft:grid ft:grid-cols-12 bg-gradient-to-tr from-[#e7e0ce] via-white  to-white px-5 sm:px-20">
+        <div className="w-full ft:h-screen">
+          <div className="w-full h-full flex flex-col justify-center items-center ft:items-start ft:grid ft:grid-cols-12 bg-gradient-to-tr from-[#e7e0ce] via-white  to-white px-5 sm:px-20">
             <div className="ft:col-span-7 ft:mt-20 flex flex-col justify-center ft:justify-start ft:items-left ">
 
-            <div className="font-medium text-center ft:text-left text-4xl sm:text-5xl">
-              <p className="">
+            <div className="font-medium text-center ft:text-left mt-8 ft:mt-0 ">
+              <p className="text-4xl ft:text-5xl">
                 Decentralized
               </p>
 
-              <p className="w-full py-2">
+              <p className="w-full py-2 text-4xl ft:text-5xl">
                 Crowdfunding Platform
               </p>
 
@@ -80,8 +80,8 @@ export default function Home() {
       
 
             </div>
-            <div className="ft:col-span-5 hidden ft:block">
-              <img src="/crowfund_clip_art.jpg" alt="crowdfund clip art" width={450} height={450}/>
+            <div className="ft:col-span-5  ">
+              <img src="/homepage_clip_art.svg" alt="crowdfund clip art" width={450} height={450}/>
             </div>
          
           </div>
