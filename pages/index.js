@@ -42,9 +42,9 @@ export default function Home() {
               />
             </div>
           </div>
-          <div className="mx-7 absolute h-4/6 flex flex-col justify-center text-white">
+          <div className="mx-7 mt-7 absolute h-4/6 flex flex-col justify-center items-center text-white">
             <div className="text-white text-3xl w-12/12 font-medium sm:text-4xl lg:text-5xl w-full lg:w-8/12 pr-2">
-              <p className="w-full">
+              <p className="w-full text-center">
                 Best Crowdfund Platform for Personal Projects
               </p>
             </div>

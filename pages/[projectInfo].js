@@ -209,7 +209,7 @@ export default function PageInfo({ projectInfo }) {
   };
 
 
-  console.log("ProjectData.isFinalized:::::::::: :::::::::::::::", projectData.isFinalized)
+  console.log("ProjectData.isFinalized:::::::::: :::::::::::::::", projectData.contractStatus)
 
   const handleSupport = () => {
     setSupportModalOpen(true);
@@ -637,7 +637,7 @@ export default function PageInfo({ projectInfo }) {
               </button>
             )}
 
-            {projectData.isFinalized == 2 && (
+            {(projectData.contractStatus == 1 || projectData.contractStatus == 2) && (
               <button
                 className="my-6 w-full cursor-not-allowed rounded-md p-2 disabled:opacity-50 bg-yellow-200 text-yellow-800"
                 disabled={true}
