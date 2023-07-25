@@ -12,6 +12,7 @@ import { ProSidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import Link from "next/link";
 import { FaChevronRight } from "react-icons/fa";
+import "animate.css";
 
 export default function Home() {
   const { isWeb3Enabled, chainId } = useMoralis();
@@ -40,7 +41,7 @@ export default function Home() {
               </p>
 
             </div>
-            <p className="my-4 text-sm leading-6 ft:w-8/12 text-center ft:text-left">This platform automate the process of project funding, 
+            <p className="my-4 animate__animated animate__backInDown  text-sm leading-6 ft:w-8/12 text-center ft:text-left">This platform automate the process of project funding, 
             execution, and payout, reducing the need for manual intervention and enhancing efficiency. </p>
             <div className="flex justify-center ft:justify-start text-base ss:text-xl mt-6">
               <button
@@ -81,7 +82,7 @@ export default function Home() {
 
             </div>
             <div className="ft:col-span-5  ">
-              <img src="/homepage_clip_art.svg" alt="crowdfund clip art" width={450} height={450}/>
+              <img src="/animated_clip_art.gif" alt="crowdfund clip art" width={800} height={800}/>
             </div>
          
           </div>
