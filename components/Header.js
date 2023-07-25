@@ -8,6 +8,8 @@ import { useEffect, useState, useCallback } from "react";
 import { useMoralis, useWeb3Contract, useChain } from "react-moralis";
 import { abi } from "../constants";
 import { BigNumber, ethers } from 'ethers';
+import { useRouter } from 'next/router';
+
 
 const useMediaQuery = (width) => {
   const [targetReached, setTargetReached] = useState(false);
@@ -44,6 +46,9 @@ export default function Header() {
   // console.log(chainIdHex)
   const chainId = parseInt(chainIdHex);
 
+  const router = useRouter();
+  const currentUrl = router.asPath;
+
   useEffect(() => {
     console.log(collapsed);
   }, [collapsed]);
@@ -52,7 +57,7 @@ export default function Header() {
   };
 
   return (
-    <div className={`ss:${chainId != 97 ? "h-30" : "h-20"} h-30 w-screen `}>
+    <div className={`ss:${chainId != 97 ? "h-30" : "h-20"} h-30`}>
       {/* Navbar */}
        {/* <button
         onClick={async () => {
@@ -112,18 +117,18 @@ export default function Header() {
             {!isBreakpoint && (
               <>
                 <Link href="/">
-                  <a className="text-white font-semibold hover:text-green-500 sm:text-xl text-lg">
+                  <a className={`text-white font-semibold ${currentUrl == "/" && "border-b-2 border-orange-700"} hover:text-orange-500 sm:text-xl text-lg`}>
                     Home
                   </a>
                 </Link>
                 <Link href="/projects">
-                  <a className="sm:ml-8 ml-6 text-white font-semibold hover:text-green-500">
+                  <a className={`sm:ml-8 ml-6 text-white ${currentUrl == "/projects" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500`}>
                     Projects
                   </a>
                 </Link>
 
                 <Link href="/launch">
-                  <a className="sm:mx-4 mx-2 w-full text-white font-semibold hover:text-green-500 ">
+                  <a className={`sm:mx-4 mx-2 w-full text-white ${currentUrl == "/launch" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 `}>
                     Get Funded
                   </a>
                 </Link>

@@ -542,11 +542,11 @@ export default function Launch() {
           </div>
         </div>
 
-        {allValid && (
+      
           <button
             className="flex flex-col w-full items-center my-5 mb-14 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleLaunch}
-            disabled={isLaunching}
+            disabled={!allValid}
           >
             {isLaunching ? (
               <div className="flex bg-green-300 text-green-800 rounded-md items-center px-3 py-3">
@@ -561,7 +561,7 @@ export default function Launch() {
               </div>
             )}
           </button>
-        )}
+      
       </section>
       <Footer />
     </>

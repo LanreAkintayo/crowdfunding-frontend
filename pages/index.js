@@ -11,6 +11,7 @@ import ProjectCardSection from "../components/ProjectCardSection";
 import { ProSidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import Link from "next/link";
+import { FaChevronRight } from "react-icons/fa";
 
 export default function Home() {
   const { isWeb3Enabled, chainId } = useMoralis();
@@ -28,30 +29,29 @@ export default function Home() {
   // };
 
   return (
-    <div className="w-screen max-w-max">
+    <div className="">
       <section>
         <Header />
 
-        <div className="relative w-full h-screen">
-          <div className="absolute w-full h-full bg-gradient-to-r dark:from-black from-black to-gray-600 dark:to-gray-700">
-            <div className="absolute w-full">
-              <img
-                alt="..."
-                src="/bg1.jpg"
-                className="object-cover w-full h-screen rounded-md opacity-1 mix-blend-overlay"
-              />
-            </div>
-          </div>
-          <div className="mx-7 mt-7 absolute h-4/6 flex flex-col justify-center items-center text-white">
-            <div className="text-white text-3xl w-12/12 font-medium sm:text-4xl lg:text-5xl w-full lg:w-8/12 pr-2">
-              <p className="w-full text-center">
-                Best Crowdfund Platform for Personal Projects
+        <div className=" w-full h-screen">
+          <div className="w-full h-full grid grid-cols-12 bg-gradient-to-tr from-[#e7e0ce] via-white  to-white px-20">
+            <div className="col-span-7 mt-20  ">
+
+            <div className="font-medium">
+              <p className="text-5xl">
+                Decentralized
               </p>
+
+              <p className="w-full text-5xl py-2">
+                Crowdfunding Platform
+              </p>
+
             </div>
-            <p className="my-4 text-xl">Fund with varieties of tokens</p>
+            <p className="my-4 text-sm leading-6 w-8/12">This platform automate the process of project funding, 
+            execution, and payout, reducing the need for manual intervention and enhancing efficiency. </p>
             <div className="flex text-base ss:text-xl mt-6">
               <button
-                className="bg-green-800 p-2 rounded-md"
+                className="bg-orange-700 w-40 rounded-full text-white p-2 py-4 hover:bg-orange-800"
                 onClick={() => {
                   if (isWeb3Enabled) {
                     window.open("/launch", "_self");
@@ -60,11 +60,16 @@ export default function Home() {
                   }
                 }}
               >
-                Get Funded
+                <div className="flex items-center justify-center ">
+                <p className="text-[12px] font-bold px-2">Get Funded</p>
+                <FaChevronRight className="text-black w-5 h-5 bg-yellow-400 rounded-full p-1" />
+                </div>
+                
+                
               </button>
 
               <button
-                className="border border-green-500 p-2 rounded-md ml-4 text-green-500"
+                className="bg-orange-100 w-40 text-orange-800 rounded-full ml-4 p-2 py-4 hover:bg-orange-200"
                 onClick={() => {
                   if (isWeb3Enabled) {
                     window.open("/projects", "_self");
@@ -73,10 +78,21 @@ export default function Home() {
                   }
                 }}
               >
+                <p className="text-[12px]">
                 Browse Project
+                </p>
+                
               </button>
             </div>
+      
+
+            </div>
+            <div className="col-span-5">
+              <img src="/crowfund_clip_art.jpg" alt="crowdfund clip art" width={450} height={450}/>
+            </div>
+         
           </div>
+         
         </div>
       </section>
       <section>

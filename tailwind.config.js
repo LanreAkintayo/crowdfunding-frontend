@@ -18,6 +18,7 @@ module.exports = {
     },
     fontFamily: {
       sans: ["Montserrat", "sans-serif"],
+      title: ['Lilita One', "cursive"],
       // logo: ['Rampart One', "cursive"]
       logo: ['Germania One', 'cursive']
     },
