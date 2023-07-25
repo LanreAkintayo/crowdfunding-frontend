@@ -14,7 +14,7 @@ export default function Backers({ backers }) {
             const account = backer[0];
 
             const tokenName = addressToToken[backer[1]];
-            let amount = fromWei(backer[2]);
+            let amount = fromWei(backer[3]);
             let dollarUSLocale = Intl.NumberFormat("en-US");
             let formattedAmount = dollarUSLocale
               .format(amount.toString())

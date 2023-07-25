@@ -17,7 +17,9 @@ export default function SupportModal({
   handlePledge,
   isFetching,
   isLoading,
-  currentBalance
+  currentBalance,
+  isPledging,
+  pledgeText
 }) {
   // const handleOnChange = (event) => {
   //   const pledgeAmount = event.target.value
@@ -60,6 +62,8 @@ export default function SupportModal({
   //   setCurrentBalance(formattedBalance)
   // }
   // }
+
+  console.log("isPledging || ....", isPledging || !isValidAmount || !selectedToken)
 
   return (
     <div className="fixed inset-0 bg-gray-900 z-50 bg-opacity-75 transition-opacity">
@@ -137,20 +141,18 @@ export default function SupportModal({
               <button
                 className={`p-2 w-full text-green-800 text-center rounded-md font-medium text-xl disabled:cursor-not-allowed disabled:opacity-50`}
                 onClick={handlePledge}
-                disabled={isFetching || isLoading || promiseInProgress || !isValidAmount || !selectedToken}
+                disabled={isPledging || !isValidAmount || !selectedToken}
               >
-                {(isFetching || isLoading || promiseInProgress) ? (
+                {isPledging ? (
                   <div className="flex flex-col w-full justify-between bg-green-300 rounded-md items-center px-3 py-3">
                     <div className="flex">
                       <ClipLoader color="#004d00" loading="true" size={30} />
-                      <p className="ml-2"> {promiseInProgress
-                    ? "Wait a few Seconds"
-                    : "Pledging"}</p>
+                      <p className="ml-2"> {pledgeText} </p>
                     </div>
                   </div>
                 ) : (
                   <div className="flex w-full bg-green-300 rounded-md items-center px-3 py-3">
-                    <p className="w-full">Pledge</p>
+                    <p className="w-full">{pledgeText}</p>
                   </div>
                 )}
               </button>

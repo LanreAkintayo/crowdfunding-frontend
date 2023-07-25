@@ -6,6 +6,8 @@ import "react-pro-sidebar/dist/css/styles.css";
 import NavigationDropdown from "./NavigationDropdown";
 import { useEffect, useState, useCallback } from "react";
 import { useMoralis, useWeb3Contract, useChain } from "react-moralis";
+import { abi } from "../constants";
+import { BigNumber, ethers } from 'ethers';
 
 const useMediaQuery = (width) => {
   const [targetReached, setTargetReached] = useState(false);
@@ -52,6 +54,21 @@ export default function Header() {
   return (
     <div className={`ss:${chainId != 97 ? "h-30" : "h-20"} h-30 w-screen `}>
       {/* Navbar */}
+       {/* <button
+        onClick={async () => {
+          
+          const iface = new ethers.utils.Interface(abi);
+          
+          // NotACustomer   0x97b96134
+          const { name } = iface.getError("0x3dd1b305");
+
+          console.log("Name: ", name)
+          // await endInvestment('0x94557752eb9922ef70df9fd1341cd93d');
+        }}
+        className="my-3 mx-10 bg-yellow-200 text-yellow-800"
+      >
+        Check Error
+      </button> */}
 
       {!collapsed && isBreakpoint && (
         <div className={`z-50 h-screen ${!collapsed && "fixed inset-0"}`}>

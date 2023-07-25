@@ -71,9 +71,16 @@ export default function PageInfo({ projectInfo }) {
   const [home, setHome] = useState(true);
   const [backers, setBackers] = useState(false);
 
+  const [pledgeText, setPledgeText] = useState("Pledge")
+  const [isPledging, setIsPledging] = useState(false)
+
   const [projectData, setProjectData] = useState({
     ...projectInfo,
   });
+
+  console.log("Project data::::: ", projectData)
+
+
 
   const chainId = parseInt(chainIdHex);
 
@@ -94,6 +101,7 @@ export default function PageInfo({ projectInfo }) {
 
   let color;
 
+  
   // console.log("Thees are all the backers ", projectData.backers)
 
   if (projectData.percentFunded > 70) {
@@ -151,7 +159,7 @@ export default function PageInfo({ projectInfo }) {
         backer[1],
         backer[2].toString(),
       ]);
-      return [backer[0], backer[1], backer[2].toString()];
+      return [backer[0], backer[1], backer[2].toString(), backer[3].toString()];
     });
 
     // console.log(ethers)
@@ -200,6 +208,9 @@ export default function PageInfo({ projectInfo }) {
     });
   };
 
+
+  console.log("ProjectData.isFinalized:::::::::: :::::::::::::::", projectData.isFinalized)
+
   const handleSupport = () => {
     setSupportModalOpen(true);
   };
@@ -243,6 +254,8 @@ export default function PageInfo({ projectInfo }) {
   const handleSuccess = async (tx) => {
     console.log("Success transaction: ", tx);
     await trackPromise(tx.wait(1));
+    setPledgeText("Pledge")
+    setIsPledging(false)
     setSupportModalOpen(false);
     dispatch({
       type: "success",
@@ -255,9 +268,9 @@ export default function PageInfo({ projectInfo }) {
   };
 
   const getNoOfBackers = () => {
-    const backersAddress = projectData.backers.map((backer) => {
+    const backersAddress = projectData.backers.length > 0 ? projectData.backers.map((backer) => {
       return backer[0];
-    });
+    }) : "";
 
     const uniqueBackers = [...new Set(backersAddress)];
 
@@ -266,6 +279,8 @@ export default function PageInfo({ projectInfo }) {
 
   const handleFailure = async (error) => {
     console.log("Error: ", error);
+    setPledgeText("Pledge")
+    setIsPledging(false)
     dispatch({
       type: "error",
       message: "Pledging Failed",
@@ -275,66 +290,82 @@ export default function PageInfo({ projectInfo }) {
   };
 
   const handlePledge = async () => {
-    const provider = await enableWeb3();
 
-    // const projects = await crowdfundContract.getAllProjects();
+    try {
 
-    const formattedPledgeAmount = ethers.utils.parseEther(
-      pledgeAmount.replace(/[^0-9.]/g, "")
-    );
-    const tokenAddress = tokenToAddress[selectedToken.name];
-    console.log(formattedPledgeAmount.toString());
-    console.log(tokenAddress);
-
-    const signer = provider.getSigner(account);
-
-    const crowdfundContract = new ethers.Contract(
-      crowdfundAddress,
-      abi,
-      provider
-    );
-    const tokensSupported = await crowdfundContract.getSupportedTokensAddress();
-    console.log("Tokens Supported: ", tokensSupported);
-
-    if (tokenAddress == tokenToAddress["BNB"]) {
-      const wbnb = new ethers.Contract(tokenAddress, wbnbAbi, provider);
-
-      const depositTx = await trackPromise(
-        wbnb.connect(signer).deposit({ value: formattedPledgeAmount })
+      setIsPledging(true)
+      setPledgeText("Pledging")
+      const provider = await enableWeb3();
+  
+      // const projects = await crowdfundContract.getAllProjects();
+  
+      const formattedPledgeAmount = ethers.utils.parseEther(
+        pledgeAmount.replace(/[^0-9.]/g, "")
       );
-      await trackPromise(depositTx.wait(1));
-
-      const approveTx = await trackPromise(
-        wbnb.connect(signer).approve(crowdfundAddress, formattedPledgeAmount)
+      const tokenAddress = tokenToAddress[selectedToken.name];
+      console.log(formattedPledgeAmount.toString());
+      console.log(tokenAddress);
+  
+      const signer = provider.getSigner(account);
+  
+      const crowdfundContract = new ethers.Contract(
+        crowdfundAddress,
+        abi,
+        provider
       );
-      await trackPromise(approveTx.wait(1));
-
-      console.log("Balance of Account: ", await wbnb.balanceOf(account));
-    } else {
-      const erc20 = new ethers.Contract(tokenAddress, erc20Abi, provider);
-      console.log("Balance of token Account: ", await erc20.balanceOf(account));
-
-      const approveTx = await trackPromise(
-        erc20.connect(signer).approve(crowdfundAddress, formattedPledgeAmount)
-      );
-      await trackPromise(approveTx.wait(1));
-    }
-
-    console.log("About to pledge");
-    pledge({
-      params: {
-        abi: abi,
-        contractAddress: crowdfundAddress, // specify the networkId
-        functionName: "pledge",
+      const tokensSupported = await crowdfundContract.getSupportedTokensAddress();
+      console.log("Tokens Supported: ", tokensSupported);
+  
+      if (tokenAddress == tokenToAddress["BNB"]) {
+        setPledgeText("Wrapping BNB to WBNB")
+        const wbnb = new ethers.Contract(tokenAddress, wbnbAbi, provider);
+  
+  
+        const depositTx = await trackPromise(
+          wbnb.connect(signer).deposit({ value: formattedPledgeAmount })
+        );
+        await trackPromise(depositTx.wait(1));
+  
+        setPledgeText("Approving WBNB")
+        const approveTx = await trackPromise(
+          wbnb.connect(signer).approve(crowdfundAddress, formattedPledgeAmount)
+        );
+        await trackPromise(approveTx.wait(1));
+  
+        console.log("Balance of Account: ", await wbnb.balanceOf(account));
+      } else {
+        setPledgeText("Approving Token")
+        const erc20 = new ethers.Contract(tokenAddress, erc20Abi, provider);
+        console.log("Balance of token Account: ", await erc20.balanceOf(account));
+  
+        const approveTx = await trackPromise(
+          erc20.connect(signer).approve(crowdfundAddress, formattedPledgeAmount)
+        );
+        await trackPromise(approveTx.wait(1));
+      }
+  
+      setPledgeText("Pledging.. ")
+      console.log("About to pledge");
+      pledge({
         params: {
-          _id: projectData.id,
-          tokenAddress: tokenAddress,
-          amount: formattedPledgeAmount,
+          abi: abi,
+          contractAddress: crowdfundAddress, // specify the networkId
+          functionName: "pledge",
+          params: {
+            _id: projectData.id,
+            tokenAddress: tokenAddress,
+            amount: formattedPledgeAmount,
+          },
         },
-      },
-      onSuccess: handleSuccess,
-      onError: handleFailure,
-    });
+        onSuccess: handleSuccess,
+        onError: handleFailure,
+      });
+
+    } catch(err){
+      setIsPledging(false)
+      setPledgeText("Pledge")
+    }
+   
   };
 
   const handleClaim = () => {
@@ -474,7 +505,7 @@ export default function PageInfo({ projectInfo }) {
               </div>
             )}
 
-            {backers && projectData.backers && (
+            {backers && projectData.backers&& (
               <div>
                 <Backers backers={projectData.backers} />
               </div>
@@ -522,21 +553,7 @@ export default function PageInfo({ projectInfo }) {
                 Support this Project
               </button>
             )}
-            {/* {if (Number(projectData.amountRaisedInDollars) <
-                Number(projectData.goal)){
-                  if (Number(projectData.amountRaisedInDollars) == 0){
-                    return (  
-                      <button
-                        className="my-6 w-full cursor-not-allowed rounded-md p-2 disabled:opacity-50 bg-yellow-200 text-yellow-800"
-                        disabled={true}
-                      >
-                        Project is Closed
-                      </button>
-                    )
-                  } else{
-
-                  }
-                }} */}
+         
             {Number(projectData.amountRaisedInDollars) == 0 &&
               projectData.status == "Unsuccessful" &&
               !projectData.isClaimed &&
@@ -620,7 +637,7 @@ export default function PageInfo({ projectInfo }) {
               </button>
             )}
 
-            {projectData.isFinalized && (
+            {projectData.isFinalized == 2 && (
               <button
                 className="my-6 w-full cursor-not-allowed rounded-md p-2 disabled:opacity-50 bg-yellow-200 text-yellow-800"
                 disabled={true}
@@ -644,6 +661,8 @@ export default function PageInfo({ projectInfo }) {
             handlePledge={handlePledge}
             isFetching={isFetchingSupport}
             isLoading={isLoadingSupport}
+            isPledging={isPledging}
+            pledgeText={pledgeText}
           />
         </div>
       )}
@@ -655,15 +674,15 @@ export default function PageInfo({ projectInfo }) {
 
 export async function getServerSideProps(context) {
   const query = context.query;
-  // console.log(context)
+  console.log("Context::::", query)
 
 
   // console.log("query.isFinalized: ", query.isFinalized)
-  console.log("Query backers:::::: ", query.backers)
+  // console.log("Query backers:::::: ", query.backers)
   const backers = JSON.parse(query.backers);
-  const isFinalized = JSON.parse(query.isFinalized);
-  const isClaimed = JSON.parse(query.isClaimed);
-  const isRefunded = JSON.parse(query.isRefunded);
+  const isFinalized = JSON.parse(query.isFinalized)
+  const isClaimed = query.isClaimed ? JSON.parse(query.isClaimed) : "";
+  const isRefunded = query.isRefunded ? JSON.parse(query.isRefunded): "";
   // const availableAmountInContract = JSON.parse(query.availableAmountInContract);
   // const totalBorrowedInContract = JSON.parse(query.totalBorrowedInContract);
   // const totalSuppliedInContract = JSON.parse(query.totalSuppliedInContract);

@@ -63,29 +63,39 @@ export default function ProjectCardSection() {
       );
       // const projects = await crowdfundContract.getAllProjects();
 
-      console.log("Get all projects::: ", projects)
+      // console.log("Get all projects::: ", projects)
 
       const allProjects = projects.map(async (project) => {
         const amountRaisedInDollars =
           await crowdfundContract.getTotalAmountRaisedInDollars(project.id);
         const backers = await crowdfundContract.getBackers(project.id);
+
+        // console.log("Backers::::::::::::::::::::: ", backers)
         const editedBackers = backers.map((backer) => {
-          console.log("Returning .............", [
-            backer[0],
-            backer[1],
-            backer[2].toString(),
-          ]);
-          return [backer[0], backer[1], backer[2].toString()];
+          // console.log("Returning .............", [
+          //   backer[0],
+          //   backer[1],
+          //   backer[2].toString(),
+          //   backer[3].toString()
+          // ]);
+          return [backer[0], backer[1], backer[2].toString(), backer[3].toString()];
         });
+
+        // console.log("Ed  ited backers:::::::: ", editedBackers)
 
         // console.log("Backers: ", backers);
 
         // const projectStuffs = await crowdfundContract.projects(project.id);
+
+        const currentProject = await crowdfundContract.projects(project.id)
+
+        // console.log("Current Project -------------------------------------> ", currentProject)
+        
         const isFinalized = (await crowdfundContract.projects(project.id))[9];
         const isClaimed = (await crowdfundContract.projects(project.id))[10];
         const isRefunded = (await crowdfundContract.projects(project.id))[11];
 
-        console.log("Is it finalized? ", isFinalized);
+        // console.log("Is it finalized? ", isFinalized);
         // console.log("Project stuffs: ", projectStuffs)
 
         let secondsLeft;
@@ -95,9 +105,9 @@ export default function ProjectCardSection() {
           Math.floor(Number(new Date().getTime() / 1000)) >
           Number(project.endDay)
         ) {
-          if (isClaimed) {
+          if (project.contractStatus == 1) {
             status = "Successful";
-          } else if (isRefunded || Number(amountRaisedInDollars) == 0) {
+          } else if (project.contractStatus == 2 || Number(amountRaisedInDollars) == 0) {
             status = "Unsuccessful";
           } else {
             status = "Closed";
@@ -138,12 +148,12 @@ export default function ProjectCardSection() {
 
       const resolved = await Promise.all(allProjects);
 
-      console.log("resolved::::::::::::: ", resolved);
+      // console.log("resolved::::::::::::: ", resolved);
       return resolved.reverse();
     }
   );
 
-  console.log("All Projects::::::::::::::::: ",allProjects)
+  // console.log("All Projects::::::::::::::::: ",allProjects)
 
   return (
     <section className=" px-5 lg:px-5 w-full">

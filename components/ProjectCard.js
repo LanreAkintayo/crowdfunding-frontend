@@ -37,6 +37,14 @@ export default function ProjectCard({ projectInfo }) {
 
   let dollarUSLocale = Intl.NumberFormat("en-US");
 
+  // const backers = JSON.stringify(projectInfo.backers)
+
+  // console.log("Backers::: ", backers)
+  // debugger
+
+  // console.log("Project Info: ", projectInfo)
+
+
   const formattedGoal = dollarUSLocale.format(goal).toString();
   return (
     <div className="my-3">
@@ -45,11 +53,11 @@ export default function ProjectCard({ projectInfo }) {
           pathname: `/${projectInfo.projectTitle}`,
           query: {
             ...projectInfo,
-            backers: JSON.stringify(projectInfo.backers),
+            backers:  JSON.stringify(projectInfo.backers)
           },
           // the data
         }}
-        as={`/${projectInfo.projectTitle}`}
+        // as={`/${projectInfo.projectTitle}`}
       >
         <div className="mx-3 my-3 relative w-auto h-full mb-5 lg:mb-0 bg-white-200 shadow-lg cursor-pointer">
           <p
@@ -75,11 +83,11 @@ export default function ProjectCard({ projectInfo }) {
               {projectInfo.projectTitle}
             </h1>
             <p className="text-sm text-gray-800">{projectInfo.projectNote.toString().substring(0, 200)}</p>
-            {!["Successful", "Unsuccessful"].includes(projectInfo.status) && (
+         
               <p className="pt-4 text-green-900">
                 {projectInfo.percentFunded}% of ${formattedGoal} Raised{" "}
               </p>
-            ) }
+            
           </div>
         </div>
       </Link>
