@@ -92,14 +92,26 @@ export default function Header() {
             <Menu iconShape="square">
               <div className="text-xl text-white hover:text-green-700">
                 <MenuItem>
-                  <Link href="/"><p className="text-2xl">Home</p></Link>
+                <Link href="/">
+                  <a className={`text-white font-semibold ${currentUrl == "/" && "border-b-2 border-orange-700"} hover:text-orange-500 sm:text-xl text-lg`}>
+                    Home
+                  </a>
+                </Link>
                 </MenuItem>
               </div>
               <MenuItem>
-                <Link href="/projects"><p className="text-2xl">Projects</p></Link>
+              <Link href="/projects">
+                  <a className={`text-white ${currentUrl == "/projects" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg`}>
+                    Projects
+                  </a>
+                </Link>
               </MenuItem>
               <MenuItem>
-                <Link href="/launch"><p className="text-2xl">Get Funded</p></Link>
+              <Link href="/launch">
+                  <a className={`w-full text-white ${currentUrl == "/launch" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg `}>
+                    Get Funded
+                  </a>
+                </Link>
               </MenuItem>
             </Menu>
           </ProSidebar>
@@ -122,7 +134,7 @@ export default function Header() {
                   </a>
                 </Link>
                 <Link href="/projects">
-                  <a className={`sm:ml-8 ml-6 text-white ${currentUrl == "/projects" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500`}>
+                  <a className={`sm:ml-8 ml-6 text-white ${currentUrl == "/projects" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg`}>
                     Projects
                   </a>
                 </Link>

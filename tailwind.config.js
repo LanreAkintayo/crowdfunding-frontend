@@ -8,6 +8,7 @@ module.exports = {
   ],
   theme: {
     screens: {
+      "ft": "900px",
       'ss': '384px',
 
       ...defaultTheme.screens,

@@ -19,14 +19,7 @@ export default function Home() {
   const [enabled, setEnabled] = useState(false);
 
   const { mutate } = useSWRConfig();
-  // const [collapsed, setCollapsed] = useState(true);
 
-  // useEffect(() => {
-  //   console.log(collapsed);
-  // }, [collapsed]);
-  // const handleSidebar = () => {
-  //   setCollapsed((prevCollapsed) => !prevCollapsed);
-  // };
 
   return (
     <div className="">
@@ -34,22 +27,22 @@ export default function Home() {
         <Header />
 
         <div className=" w-full h-screen">
-          <div className="w-full h-full grid grid-cols-12 bg-gradient-to-tr from-[#e7e0ce] via-white  to-white px-20">
-            <div className="col-span-7 mt-20  ">
+          <div className="w-full h-full flex flex-col justify-center ft:grid ft:grid-cols-12 bg-gradient-to-tr from-[#e7e0ce] via-white  to-white px-5 sm:px-20">
+            <div className="ft:col-span-7 ft:mt-20 flex flex-col justify-center ft:justify-start ft:items-left ">
 
-            <div className="font-medium">
-              <p className="text-5xl">
+            <div className="font-medium text-center ft:text-left text-4xl sm:text-5xl">
+              <p className="">
                 Decentralized
               </p>
 
-              <p className="w-full text-5xl py-2">
+              <p className="w-full py-2">
                 Crowdfunding Platform
               </p>
 
             </div>
-            <p className="my-4 text-sm leading-6 w-8/12">This platform automate the process of project funding, 
+            <p className="my-4 text-sm leading-6 ft:w-8/12 text-center ft:text-left">This platform automate the process of project funding, 
             execution, and payout, reducing the need for manual intervention and enhancing efficiency. </p>
-            <div className="flex text-base ss:text-xl mt-6">
+            <div className="flex justify-center ft:justify-start text-base ss:text-xl mt-6">
               <button
                 className="bg-orange-700 w-40 rounded-full text-white p-2 py-4 hover:bg-orange-800"
                 onClick={() => {
@@ -87,7 +80,7 @@ export default function Home() {
       
 
             </div>
-            <div className="col-span-5">
+            <div className="ft:col-span-5 hidden ft:block">
               <img src="/crowfund_clip_art.jpg" alt="crowdfund clip art" width={450} height={450}/>
             </div>
          
