@@ -24,14 +24,15 @@ export default function Home() {
 
   return (
     <div className="">
-      <section>
+      <section className="ft:flex ft:flex-col ft:h-screen">
+       
         <Header />
 
-        <div className="w-full ft:h-screen">
-          <div className="w-full h-full flex flex-col justify-center items-center ft:items-start ft:grid ft:grid-cols-12 bg-gradient-to-tr from-[#e7e0ce] via-white  to-white px-5 sm:px-20">
-            <div className="ft:col-span-7 ft:mt-20 flex flex-col justify-center ft:justify-start ft:items-left ">
+        <div className="w-full flex-1">
+          <div className="w-full h-full flex flex-col justify-center items-center ft:gap-1  ft:grid ft:grid-cols-12 bg-gradient-to-tr from-[#e7e0ce] via-white  to-white px-5 sm:px-20">
+            <div className="ft:col-span-7 flex flex-col justify-center ft:justify-start ft:items-left ">
 
-            <div className="font-medium text-center ft:text-left mt-8 ft:mt-0 ">
+            <div className="font-medium text-center ft:text-left ft:mt-0 mt-3 ">
               <p className="text-4xl ft:text-5xl">
                 Decentralized
               </p>
@@ -81,16 +82,16 @@ export default function Home() {
       
 
             </div>
-            <div className="ft:col-span-5  ">
-              <img src="/homepage_clip_art.svg" alt="crowdfund clip art" width={800} height={800}/>
+            <div className="ft:col-span-5 ">
+              <Image src="/homepage_clip_art.svg" alt="crowdfund clip art" width={800} height={900} objectFit="cover"/>
             </div>
          
           </div>
          
         </div>
       </section>
-      <section>
-        <h1 className="text-3xl mt-10 px-5">Explore Projects</h1>
+      <section className="">
+        <h1 className="text-3xl mt-4 ft:mt-10 px-5">Explore Projects</h1>
         <ProjectCardSection />
       </section>
       <Footer />
