@@ -64,7 +64,7 @@ export default function PageInfo({ projectInfo }) {
   const [selectedToken, setSelectedToken] = useState({});
   const [pledgeAmount, setPledgeAmount] = useState();
   const [isValidAmount, setIsValidAmount] = useState(false);
-  const dispatch = useNotification();
+  // const dispatch = useNotification();
   const { promiseInProgress } = usePromiseTracker();
   const { mutate } = useSWRConfig();
   const [currentBalance, setCurrentBalance] = useState("");

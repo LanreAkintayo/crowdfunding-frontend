@@ -47,7 +47,7 @@ export default function Launch() {
   } = useWeb3Contract();
   const { promiseInProgress } = usePromiseTracker();
 
-  const dispatch = useNotification();
+  // const dispatch = useNotification();
 
   const chainId = parseInt(chainIdHex);
   const [currentUrl, setCurrentUrl] = useState("");
