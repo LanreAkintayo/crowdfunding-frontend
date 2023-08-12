@@ -12,6 +12,7 @@ import { usePromiseTracker, trackPromise } from "react-promise-tracker";
 import { sDuration } from "../utils/helper";
 
 import "react-datepicker/dist/react-datepicker.css";
+import { displayToast } from "../components/Toast";
 // import DatePicker from "sassy-datepicker";
 
 /* Create an instance of the client */
@@ -253,12 +254,14 @@ export default function Launch() {
     // updateUIValues()
     setLaunchText("Publish Your Project")
     setIsLaunching(false)
-    dispatch({
-      type: "success",
-      message: "Transaction Completed!",
-      title: "Transaction Notification",
-      position: "topR",
-    });
+
+    displayToast("success", "Project has been launched successfully")
+    // dispatch({
+    //   type: "success",
+    //   message: "Transaction Completed!",
+    //   title: "Transaction Notification",
+    //   position: "topR",
+    // });
   };
 
   const handleFailure = async (error) => {
@@ -266,12 +269,14 @@ export default function Launch() {
     setLaunchText("Publish Your Project")
     setIsLaunching(false)
 
-    dispatch({
-      type: "error",
-      message: "Transation Failed",
-      title: "Transaction Notification",
-      position: "topR",
-    });
+    displayToast("failure", "Failed to launch Project")
+
+    // dispatch({
+    //   type: "error",
+    //   message: "Transation Failed",
+    //   title: "Transaction Notification",
+    //   position: "topR",
+    // });
   };
 
   return (

@@ -16,6 +16,7 @@ import { trackPromise, usePromiseTracker } from "react-promise-tracker";
 import Footer from "../components/Footer";
 import Backers from "../components/Backers";
 import { toWei, fromWei, tokenToAddress } from "../utils/helper";
+import { displayToast } from "../components/Toast";
 // import { getAllProjects } from "../lib/projects";
 
 const supportedTokens = [
@@ -257,12 +258,14 @@ export default function PageInfo({ projectInfo }) {
     setPledgeText("Pledge")
     setIsPledging(false)
     setSupportModalOpen(false);
-    dispatch({
-      type: "success",
-      message: "Pledging Completed!",
-      title: "Transaction Notification",
-      position: "topR",
-    });
+
+     displayToast("success", "Pledging has completed")
+    // dispatch({
+    //   type: "success",
+    //   message: "Pledging Completed!",
+    //   title: "Transaction Notification",
+    //   position: "topR",
+    // });
 
     await fetchProjectInfo();
   };
@@ -281,12 +284,14 @@ export default function PageInfo({ projectInfo }) {
     console.log("Error: ", error);
     setPledgeText("Pledge")
     setIsPledging(false)
-    dispatch({
-      type: "error",
-      message: "Pledging Failed",
-      title: "Transaction Notification",
-      position: "topR",
-    });
+
+    displayToast("failure", "Failed to pledge")
+    // dispatch({
+    //   type: "error",
+    //   message: "Pledging Failed",
+    //   title: "Transaction Notification",
+    //   position: "topR",
+    // });
   };
 
   const handlePledge = async () => {
