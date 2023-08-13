@@ -25,7 +25,7 @@ const Home = () => {
 
   return (
     <div className="">
-      <section className="ft:flex ft:flex-col ft:h-screen">
+      <section className="ft:flex ft:flex-col">
         <div className="w-full flex-1">
           <div className="w-full h-full flex flex-col justify-center items-center ft:gap-1  ft:grid ft:grid-cols-12 bg-gradient-to-tr from-[#e7e0ce] via-white  to-white px-5 sm:px-20">
             <div className="ft:col-span-7 flex flex-col justify-center ft:justify-start ft:items-left ">
