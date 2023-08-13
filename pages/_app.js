@@ -4,12 +4,13 @@ import { NotificationProvider } from "web3uikit";
 import { ToastContainer } from 'react-toastify';
 
 function MyApp({ Component, pageProps }) {
+  const getLayout = Component.getLayout ?? ((page) => page);
+  
   return (
     <MoralisProvider initializeOnMount={false}>
- 
-        <Component {...pageProps} />
+      {getLayout(<Component {...pageProps} />)}
 
-       <ToastContainer />
+      <ToastContainer />
     </MoralisProvider>
   );
 }

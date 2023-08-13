@@ -18,6 +18,7 @@ import Backers from "../components/Backers";
 import { toWei, fromWei, tokenToAddress } from "../utils/helper";
 import { displayToast } from "../components/Toast";
 import { getProjectInfo } from "../lib/fetchProjectInfo";
+import Layout from "./layout";
 // import { getAllProjects } from "../lib/projects";
 
 const supportedTokens = [
@@ -75,7 +76,7 @@ function time2(seconds) {
   // return formattedTime;
 }
 
-export default function PageInfo({ projectInfo }) {
+const PageInfo = ({ projectInfo }) => {
   const {
     Moralis,
     isWeb3Enabled,
@@ -195,6 +196,7 @@ export default function PageInfo({ projectInfo }) {
         projectSubtitle,
         projectNote,
         projectImageUrl,
+        contractStatus,
         isClosed,
         amountRaisedInDollars: amountRaisedInDollars.toString(),
         endDay: endDay.toString(),
@@ -554,15 +556,9 @@ export default function PageInfo({ projectInfo }) {
   //     !projectData.isRefunded
   // );
 
-  console.log("Project data.secondsLeft: ", projectData.secondsLeft);
+  console.log("Project data.contractStatus: ", projectData.contractStatus);
   return (
     <>
-      <section>
-        <div className="h-20">
-          {/* Navbar */}
-          <Header />
-        </div>
-      </section>
       <section>
         <h1 className="w-full text-center pt-3 text-2xl sm:text-3xl">
           {projectData.projectTitle}
@@ -805,7 +801,6 @@ export default function PageInfo({ projectInfo }) {
         </div>
       )}
 
-      <Footer />
     </>
   );
 }
@@ -863,3 +858,9 @@ export async function getServerSideProps(context) {
 //     fallback: false,
 //   };
 // }
+
+PageInfo.getLayout = function getLayout(page) {
+  return <Layout>{page}</Layout>;
+};
+
+export default PageInfo;

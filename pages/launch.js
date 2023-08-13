@@ -13,6 +13,7 @@ import { now, now2, sDuration } from "../utils/helper";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { displayToast } from "../components/Toast";
+import Layout from "./layout";
 // import DatePicker from "sassy-datepicker";
 
 /* Create an instance of the client */
@@ -37,7 +38,7 @@ const client = create({
   },
 });
 
-export default function Launch() {
+const Launch = () => {
   const {
     Moralis,
     isWeb3Enabled,
@@ -296,7 +297,6 @@ export default function Launch() {
 
   return (
     <>
-      <Header />
       <section>
         <div className="w-full flex my-5 text-base px-3  md:text-xl flex-col items-center">
           <h1 className="text-center">
@@ -580,7 +580,13 @@ export default function Launch() {
           )}
         </button>
       </section>
-      <Footer />
     </>
   );
 }
+
+
+Launch.getLayout = function getLayout(page) {
+  return <Layout>{page}</Layout>;
+};
+
+export default Launch;
