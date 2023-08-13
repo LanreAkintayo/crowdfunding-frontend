@@ -59,8 +59,22 @@ export const sDuration = {
   },
 };
 
+export const now2 = async () => {
+  const blockNumber = await ethers.providers.getBlockNumber();
+  const block = await ethers.providers.getBlock(blockNumber);
+
+  console.log("Now 2: ", block)
+
+  return block.timestamp;
+
+};
+
 export const now = () => {
-  return new Date().getTime();
+  
+  const time = new Date().getTime();
+  console.log("Now: ", time)
+  return time;
+
 };
 
 export const time = ((milliseconds) => {

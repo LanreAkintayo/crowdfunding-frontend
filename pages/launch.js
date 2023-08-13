@@ -9,7 +9,7 @@ import { ethers } from "ethers";
 import { RotateLoader, ClipLoader } from "react-spinners";
 import { useNotification } from "web3uikit";
 import { usePromiseTracker, trackPromise } from "react-promise-tracker";
-import { sDuration } from "../utils/helper";
+import { now, now2, sDuration } from "../utils/helper";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { displayToast } from "../components/Toast";
@@ -22,9 +22,8 @@ import { displayToast } from "../components/Toast";
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 const projectSecret = process.env.NEXT_PUBLIC_API_SECRET_KEY;
 
-
-console.log(projectId)
-console.log(projectSecret)
+console.log(projectId);
+console.log(projectSecret);
 
 const auth =
   "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
@@ -39,7 +38,12 @@ const client = create({
 });
 
 export default function Launch() {
-  const { Moralis, isWeb3Enabled, chainId: chainIdHex } = useMoralis();
+  const {
+    Moralis,
+    isWeb3Enabled,
+    chainId: chainIdHex,
+    enableWeb3,
+  } = useMoralis();
   const {
     runContractFunction: launch,
     isFetching,
@@ -71,15 +75,23 @@ export default function Launch() {
     duration: "",
     goal: "",
   });
+
+  console.log("Date at the beggining that was set::::", new Date());
   const [isValidDuration, setIsValidDuration] = useState(true);
   const [isValidLaunchDate, setIsValidLaunchDate] = useState(true);
   const [isValidGoal, setIsValidGoal] = useState(true);
 
-  const [launchText, setLaunchText] = useState("Publish Your Project")
-  const [isLaunching, setIsLaunching] = useState(false)
+  const [launchText, setLaunchText] = useState("Publish Your Project");
+  const [isLaunching, setIsLaunching] = useState(false);
 
   useEffect(() => {
     console.log("Here is the current url: ", currentUrl);
+    const tme = async () => {
+      await now();
+      // await now2()
+    };
+
+    tme();
   }, [currentUrl]);
 
   useEffect(() => {
@@ -177,25 +189,28 @@ export default function Launch() {
   // }, [project]);
 
   const handleLaunch = async () => {
-    setIsLaunching(true)
-    setLaunchText("Publishing Project")
+    setIsLaunching(true);
+    setLaunchText("Publishing Project");
 
+    console.log("Date when launching:: ", projectInfo.launchDate);
+
+    // debugger
     const goalInDollars = projectInfo.goal.replace(/[^0-9]/g, "");
     const startDayInSeconds = Math.floor(
       projectInfo.launchDate.getTime() / 1000
     );
-    
-    const duration = sDuration.minutes(Number(projectInfo.duration))
 
-    console.log("duration is", duration)
+    const duration = sDuration.minutes(Number(projectInfo.duration));
+
+    console.log("duration is", duration);
     // console.log(startDayInSeconds);
 
     try {
-      setLaunchText("Uploading data to IPFS")
+      setLaunchText("Uploading data to IPFS");
       const uploadedImage = await trackPromise(client.add(imageFile));
       const url = `https://cloudflare-ipfs.com/ipfs/${uploadedImage.path}`;
 
-      setLaunchText("Publishing Project")
+      setLaunchText("Publishing Project");
 
       launch({
         params: {
@@ -252,10 +267,10 @@ export default function Launch() {
     console.log("Success transaction: ", tx);
     await trackPromise(tx.wait(1));
     // updateUIValues()
-    setLaunchText("Publish Your Project")
-    setIsLaunching(false)
+    setLaunchText("Publish Your Project");
+    setIsLaunching(false);
 
-    displayToast("success", "Project has been launched successfully")
+    displayToast("success", "Project has been launched successfully");
     // dispatch({
     //   type: "success",
     //   message: "Transaction Completed!",
@@ -266,10 +281,10 @@ export default function Launch() {
 
   const handleFailure = async (error) => {
     console.log("Error: ", error);
-    setLaunchText("Publish Your Project")
-    setIsLaunching(false)
+    setLaunchText("Publish Your Project");
+    setIsLaunching(false);
 
-    displayToast("failure", "Failed to launch Project")
+    displayToast("failure", "Failed to launch Project");
 
     // dispatch({
     //   type: "error",
@@ -547,26 +562,23 @@ export default function Launch() {
           </div>
         </div>
 
-      
-          <button
-            className="flex flex-col w-full items-center my-5 mb-14 disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleLaunch}
-            disabled={!allValid}
-          >
-            {isLaunching ? (
-              <div className="flex bg-green-300 text-green-800 rounded-md items-center px-3 py-3">
-                <ClipLoader color="#004d00" loading="true" size={30} />
-                <p className="ml-2">
-                 {launchText}
-                </p>
-              </div>
-            ) : (
-              <div className="flex bg-green-300 text-green-800 rounded-md items-center px-3 py-3">
-                <p className="">{launchText}</p>
-              </div>
-            )}
-          </button>
-      
+        <button
+          className="flex flex-col w-full items-center my-5 mb-14 disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={handleLaunch}
+          disabled={!allValid}
+          // disabled={false}
+        >
+          {isLaunching ? (
+            <div className="flex bg-green-300 text-green-800 rounded-md items-center px-3 py-3">
+              <ClipLoader color="#004d00" loading="true" size={30} />
+              <p className="ml-2">{launchText}</p>
+            </div>
+          ) : (
+            <div className="flex bg-green-300 text-green-800 rounded-md items-center px-3 py-3">
+              <p className="">{launchText}</p>
+            </div>
+          )}
+        </button>
       </section>
       <Footer />
     </>

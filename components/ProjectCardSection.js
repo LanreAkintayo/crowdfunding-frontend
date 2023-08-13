@@ -55,48 +55,31 @@ export default function ProjectCardSection() {
         onSuccess: (tx) => console.log("all Project", tx),
         onError: (error) => console.log(error),
       });
+
+      console.log("Projects:::", projects)
+
       const provider = await enableWeb3();
       const crowdfundContract = new ethers.Contract(
         crowdfundAddress,
         abi,
         provider
       );
-      // const projects = await crowdfundContract.getAllProjects();
-
-      // console.log("Get all projects::: ", projects)
 
       const allProjects = projects.map(async (project) => {
         const amountRaisedInDollars =
           await crowdfundContract.getTotalAmountRaisedInDollars(project.id);
         const backers = await crowdfundContract.getBackers(project.id);
 
-        // console.log("Backers::::::::::::::::::::: ", backers)
         const editedBackers = backers.map((backer) => {
-          // console.log("Returning .............", [
-          //   backer[0],
-          //   backer[1],
-          //   backer[2].toString(),
-          //   backer[3].toString()
-          // ]);
+        
           return [backer[0], backer[1], backer[2].toString(), backer[3].toString()];
         });
 
-        // console.log("Ed  ited backers:::::::: ", editedBackers)
-
-        // console.log("Backers: ", backers);
-
-        // const projectStuffs = await crowdfundContract.projects(project.id);
-
         const currentProject = await crowdfundContract.projects(project.id)
 
-        // console.log("Current Project -------------------------------------> ", currentProject)
-        
         const isFinalized = (await crowdfundContract.projects(project.id))[9];
         const isClaimed = (await crowdfundContract.projects(project.id))[10];
         const isRefunded = (await crowdfundContract.projects(project.id))[11];
-
-        // console.log("Is it finalized? ", isFinalized);
-        // console.log("Project stuffs: ", projectStuffs)
 
         let secondsLeft;
         let status;
@@ -148,7 +131,6 @@ export default function ProjectCardSection() {
 
       const resolved = await Promise.all(allProjects);
 
-      // console.log("resolved::::::::::::: ", resolved);
       return resolved.reverse();
     }
   );

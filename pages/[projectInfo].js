@@ -1,7 +1,7 @@
 import Header from "../components/Header";
 import SupportModal from "../components/SupportModal";
 import { ethers } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useMoralis,
   useWeb3Contract,
@@ -17,6 +17,7 @@ import Footer from "../components/Footer";
 import Backers from "../components/Backers";
 import { toWei, fromWei, tokenToAddress } from "../utils/helper";
 import { displayToast } from "../components/Toast";
+import { getProjectInfo } from "../lib/fetchProjectInfo";
 // import { getAllProjects } from "../lib/projects";
 
 const supportedTokens = [
@@ -51,6 +52,29 @@ const time = ((milliseconds) => {
   };
 })();
 
+function time2(seconds) {
+  const days = Math.floor(seconds / 86400);
+  seconds %= 86400;
+
+  const hours = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  const minutes = Math.floor(seconds / 60);
+  seconds %= 60;
+
+  const formattedTime = {
+    days: days,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
+  };
+
+  return `${days} Days ${hours} Hours ${minutes} Minutes ${
+    minutes == 0 ? `${seconds} Seconds` : ""
+  }`;
+
+  // return formattedTime;
+}
+
 export default function PageInfo({ projectInfo }) {
   const {
     Moralis,
@@ -72,16 +96,131 @@ export default function PageInfo({ projectInfo }) {
   const [home, setHome] = useState(true);
   const [backers, setBackers] = useState(false);
 
-  const [pledgeText, setPledgeText] = useState("Pledge")
-  const [isPledging, setIsPledging] = useState(false)
+  const [pledgeText, setPledgeText] = useState("Pledge");
+  const [isPledging, setIsPledging] = useState(false);
 
   const [projectData, setProjectData] = useState({
     ...projectInfo,
   });
 
-  console.log("Project data::::: ", projectData)
+  const { data: xyz, error } = useSWR(
+    () => (isWeb3Enabled ? "web3/currentProject" : null),
+    async () => {
+      const provider = await enableWeb3();
 
+      const crowdfundContract = new ethers.Contract(
+        crowdfundAddress,
+        abi,
+        provider
+      );
 
+      const newprojects = await crowdfundContract.getAllProjects();
+
+      const project = newprojects[projectData.id];
+
+      const [
+        owner,
+        id,
+        startDay,
+        endDay,
+        goal,
+        projectTitle,
+        projectSubtitle,
+        projectNote,
+        projectImageUrl,
+        contractStatus,
+        isClosed,
+      ] = project;
+
+      const amountRaisedInDollars =
+        await crowdfundContract.getTotalAmountRaisedInDollars(id);
+      const backers = await crowdfundContract.getBackers(id);
+
+      const editedBackers = backers.map((backer) => {
+        return [
+          backer[0],
+          backer[1],
+          backer[2].toString(),
+          backer[3].toString(),
+        ];
+      });
+
+      const isFinalized = (await crowdfundContract.projects(id))[9];
+      const isClaimed = (await crowdfundContract.projects(id))[10];
+      const isRefunded = (await crowdfundContract.projects(id))[11];
+
+      let secondsLeft;
+      let status;
+
+      if (Math.floor(Number(new Date().getTime() / 1000)) > Number(endDay)) {
+        if (contractStatus == 1) {
+          status = "Successful";
+        } else if (contractStatus == 2 || Number(amountRaisedInDollars) == 0) {
+          status = "Unsuccessful";
+        } else {
+          status = "Closed";
+        }
+        secondsLeft = 0;
+      } else if (
+        Number(Math.floor(Number(new Date().getTime() / 1000))) >=
+        Number(startDay)
+      ) {
+        status = "Active";
+        secondsLeft =
+          Number(endDay) -
+          Number(Math.floor(Number(new Date().getTime() / 1000)));
+
+        console.log("Number(endDay): ", Number(endDay));
+        console.log(
+          "Current date: ",
+          Number(Math.floor(Number(new Date().getTime() / 1000)))
+        );
+
+        console.log(
+          "Seconds remaining: ",
+          Number(endDay) -
+            Number(Math.floor(Number(new Date().getTime() / 1000)))
+        );
+      } else {
+        status = "Pending";
+        secondsLeft = 0;
+      }
+
+      const percentFunded =
+        (Number(amountRaisedInDollars) / Number(goal)) * 100;
+
+      return {
+        owner,
+        projectTitle,
+        projectSubtitle,
+        projectNote,
+        projectImageUrl,
+        isClosed,
+        amountRaisedInDollars: amountRaisedInDollars.toString(),
+        endDay: endDay.toString(),
+        goal: goal.toString(),
+        id: id.toString(),
+        startDay: startDay.toString(),
+        secondsLeft,
+        status,
+        percentFunded: percentFunded >= 100 ? 100 : Math.floor(percentFunded),
+        backers: editedBackers,
+        isFinalized,
+        isClaimed,
+        isRefunded,
+      };
+    }
+  );
+
+  useEffect(() => {
+    const doSomeStuff = () => {
+      if (xyz) {
+        setProjectData(xyz);
+      }
+    };
+
+    doSomeStuff();
+  }, [xyz]);
 
   const chainId = parseInt(chainIdHex);
 
@@ -101,9 +240,6 @@ export default function PageInfo({ projectInfo }) {
     .toString();
 
   let color;
-
-  
-  // console.log("Thees are all the backers ", projectData.backers)
 
   if (projectData.percentFunded > 70) {
     color = "bg-green-700";
@@ -163,11 +299,6 @@ export default function PageInfo({ projectInfo }) {
       return [backer[0], backer[1], backer[2].toString(), backer[3].toString()];
     });
 
-    // console.log(ethers)
-
-    // const uniqueBackers = [...new Set(backersAddress)];
-    // console.log("Unique backers: ", uniqueBackers)
-
     let secondsLeft;
     let status;
 
@@ -209,9 +340,6 @@ export default function PageInfo({ projectInfo }) {
     });
   };
 
-
-  console.log("ProjectData.isFinalized:::::::::: :::::::::::::::", projectData.contractStatus)
-
   const handleSupport = () => {
     setSupportModalOpen(true);
   };
@@ -238,7 +366,6 @@ export default function PageInfo({ projectInfo }) {
     } else {
       const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      console.log("Web3Provider: ", web3Provider);
       balance = (await web3Provider.getBalance(account)).toString();
     }
 
@@ -255,11 +382,11 @@ export default function PageInfo({ projectInfo }) {
   const handleSuccess = async (tx) => {
     console.log("Success transaction: ", tx);
     await trackPromise(tx.wait(1));
-    setPledgeText("Pledge")
-    setIsPledging(false)
+    setPledgeText("Pledge");
+    setIsPledging(false);
     setSupportModalOpen(false);
 
-     displayToast("success", "Pledging has completed")
+    displayToast("success", "Pledging has completed");
     // dispatch({
     //   type: "success",
     //   message: "Pledging Completed!",
@@ -271,9 +398,12 @@ export default function PageInfo({ projectInfo }) {
   };
 
   const getNoOfBackers = () => {
-    const backersAddress = projectData.backers.length > 0 ? projectData.backers.map((backer) => {
-      return backer[0];
-    }) : "";
+    const backersAddress =
+      projectData.backers.length > 0
+        ? projectData.backers.map((backer) => {
+            return backer[0];
+          })
+        : "";
 
     const uniqueBackers = [...new Set(backersAddress)];
 
@@ -282,10 +412,10 @@ export default function PageInfo({ projectInfo }) {
 
   const handleFailure = async (error) => {
     console.log("Error: ", error);
-    setPledgeText("Pledge")
-    setIsPledging(false)
+    setPledgeText("Pledge");
+    setIsPledging(false);
 
-    displayToast("failure", "Failed to pledge")
+    displayToast("failure", "Failed to pledge");
     // dispatch({
     //   type: "error",
     //   message: "Pledging Failed",
@@ -295,61 +425,62 @@ export default function PageInfo({ projectInfo }) {
   };
 
   const handlePledge = async () => {
-
     try {
-
-      setIsPledging(true)
-      setPledgeText("Pledging")
+      setIsPledging(true);
+      setPledgeText("Pledging");
       const provider = await enableWeb3();
-  
+
       // const projects = await crowdfundContract.getAllProjects();
-  
+
       const formattedPledgeAmount = ethers.utils.parseEther(
         pledgeAmount.replace(/[^0-9.]/g, "")
       );
       const tokenAddress = tokenToAddress[selectedToken.name];
-      console.log(formattedPledgeAmount.toString());
-      console.log(tokenAddress);
-  
+      // console.log(formattedPledgeAmount.toString());
+      // console.log(tokenAddress);
+
       const signer = provider.getSigner(account);
-  
+
       const crowdfundContract = new ethers.Contract(
         crowdfundAddress,
         abi,
         provider
       );
-      const tokensSupported = await crowdfundContract.getSupportedTokensAddress();
+      const tokensSupported =
+        await crowdfundContract.getSupportedTokensAddress();
       console.log("Tokens Supported: ", tokensSupported);
-  
+
       if (tokenAddress == tokenToAddress["BNB"]) {
-        setPledgeText("Wrapping BNB to WBNB")
+        setPledgeText("Wrapping BNB to WBNB");
         const wbnb = new ethers.Contract(tokenAddress, wbnbAbi, provider);
-  
-  
+
         const depositTx = await trackPromise(
           wbnb.connect(signer).deposit({ value: formattedPledgeAmount })
         );
         await trackPromise(depositTx.wait(1));
-  
-        setPledgeText("Approving WBNB")
+
+        setPledgeText("Approving WBNB");
         const approveTx = await trackPromise(
           wbnb.connect(signer).approve(crowdfundAddress, formattedPledgeAmount)
         );
         await trackPromise(approveTx.wait(1));
-  
+
         console.log("Balance of Account: ", await wbnb.balanceOf(account));
       } else {
-        setPledgeText("Approving Token")
+        setPledgeText("Approving Token");
         const erc20 = new ethers.Contract(tokenAddress, erc20Abi, provider);
-        console.log("Balance of token Account: ", await erc20.balanceOf(account));
-  
+        console.log(
+          "Balance of token Account: ",
+          await erc20.balanceOf(account)
+        );
+
         const approveTx = await trackPromise(
           erc20.connect(signer).approve(crowdfundAddress, formattedPledgeAmount)
         );
         await trackPromise(approveTx.wait(1));
       }
-  
-      setPledgeText("Pledging.. ")
+
+      setPledgeText("Pledging.. ");
       console.log("About to pledge");
       pledge({
         params: {
@@ -365,12 +496,10 @@ export default function PageInfo({ projectInfo }) {
         onSuccess: handleSuccess,
         onError: handleFailure,
       });
-
-    } catch(err){
-      setIsPledging(false)
-      setPledgeText("Pledge")
+    } catch (err) {
+      setIsPledging(false);
+      setPledgeText("Pledge");
     }
-   
   };
 
   const handleClaim = () => {
@@ -418,13 +547,14 @@ export default function PageInfo({ projectInfo }) {
     setPledgeAmount(pledgeAmount);
   };
 
-  console.log(
-    Number(projectData.amountRaisedInDollars) == 0 &&
-      projectData.status == "Unsuccessful" &&
-      !projectData.isClaimed &&
-      !projectData.isRefunded
-  );
+  // console.log(
+  //   Number(projectData.amountRaisedInDollars) == 0 &&
+  //     projectData.status == "Unsuccessful" &&
+  //     !projectData.isClaimed &&
+  //     !projectData.isRefunded
+  // );
 
+  console.log("Project data.secondsLeft: ", projectData.secondsLeft);
   return (
     <>
       <section>
@@ -510,7 +640,7 @@ export default function PageInfo({ projectInfo }) {
               </div>
             )}
 
-            {backers && projectData.backers&& (
+            {backers && projectData.backers && (
               <div>
                 <Backers backers={projectData.backers} />
               </div>
@@ -542,12 +672,14 @@ export default function PageInfo({ projectInfo }) {
                 </p>
               </div>
 
-              <div className="flex flex-col mt-6">
-                <h1 className=" text-xl md:text-2xl text-gray-800">
-                  {time(projectInfo.secondsLeft * 1000)}
-                </h1>
-                <p className="text-sm text-gray-500">remaining</p>
-              </div>
+              {xyz && (
+                <div className="flex flex-col mt-6">
+                  <h1 className=" text-xl md:text-2xl text-gray-800">
+                    {time2(projectData.secondsLeft)}
+                  </h1>
+                  <p className="text-sm text-gray-500">remaining</p>
+                </div>
+              )}
             </div>
 
             {projectData.secondsLeft > 0 && (
@@ -558,7 +690,7 @@ export default function PageInfo({ projectInfo }) {
                 Support this Project
               </button>
             )}
-         
+
             {Number(projectData.amountRaisedInDollars) == 0 &&
               projectData.status == "Unsuccessful" &&
               !projectData.isClaimed &&
@@ -642,7 +774,8 @@ export default function PageInfo({ projectInfo }) {
               </button>
             )}
 
-            {(projectData.contractStatus == 1 || projectData.contractStatus == 2) && (
+            {(projectData.contractStatus == 1 ||
+              projectData.contractStatus == 2) && (
               <button
                 className="my-6 w-full cursor-not-allowed rounded-md p-2 disabled:opacity-50 bg-yellow-200 text-yellow-800"
                 disabled={true}
@@ -679,15 +812,28 @@ export default function PageInfo({ projectInfo }) {
 
 export async function getServerSideProps(context) {
   const query = context.query;
-  console.log("Context::::", query)
+  console.log("Context::::", query);
 
+  // const projectInfo1 = await getProjectInfo(1)
+  // console.log("Proct info 1: ", projectInfo1)
+
+  //  const {
+  //   runContractFunction: getAllProjects,
+  //   isFetching,
+  //   isLoading,
+  // } = useWeb3Contract({
+  //   abi: abi,
+  //   contractAddress: crowdfundAddress,
+  //   functionName: "getAllProjects",
+  //   params: {},
+  // });
 
   // console.log("query.isFinalized: ", query.isFinalized)
   // console.log("Query backers:::::: ", query.backers)
   const backers = JSON.parse(query.backers);
-  const isFinalized = JSON.parse(query.isFinalized)
+  const isFinalized = JSON.parse(query.isFinalized);
   const isClaimed = query.isClaimed ? JSON.parse(query.isClaimed) : "";
-  const isRefunded = query.isRefunded ? JSON.parse(query.isRefunded): "";
+  const isRefunded = query.isRefunded ? JSON.parse(query.isRefunded) : "";
   // const availableAmountInContract = JSON.parse(query.availableAmountInContract);
   // const totalBorrowedInContract = JSON.parse(query.totalBorrowedInContract);
   // const totalSuppliedInContract = JSON.parse(query.totalSuppliedInContract);
