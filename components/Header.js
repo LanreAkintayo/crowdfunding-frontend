@@ -59,23 +59,9 @@ export default function Header() {
   };
 
   return (
-    <div className={`ss:${chainId != 97 ? "h-30" : "h-20"} h-30 w-screen`}>
+    <div className={`ss:${chainId != 97 ? "h-30" : "h-20"} h-30 `}>
       {/* Navbar */}
-       {/* <button
-        onClick={async () => {
-          
-          const iface = new ethers.utils.Interface(abi);
-          
-          // NotACustomer   0x97b96134
-          const { name } = iface.getError("0x3dd1b305");
-
-          console.log("Name: ", name)
-          // await endInvestment('0x94557752eb9922ef70df9fd1341cd93d');
-        }}
-        className="my-3 mx-10 bg-yellow-200 text-yellow-800"
-      >
-        Check Error
-      </button> */}
+     
 
       {!collapsed && isBreakpoint && (
         <div className={`z-50 h-screen ${!collapsed && "fixed inset-0"}`}>
@@ -120,8 +106,8 @@ export default function Header() {
         </div>
       )}
 
-      <nav className="flex items-center flex-col ss:flex-row w-full justify-between px-2 py-2 sm:px-4 sm:py-4 h-full text-white bg-zinc-800 ">
-        <p className="font-logo text-xl sm:text-3xl self-start ss:self-auto ss:block hidden">
+      <nav className="flex items-end flex-row w-full justify-end hh:justify-between px-2 py-2 sm:px-4 sm:py-4 h-full text-white bg-zinc-800 ">
+        <p className="font-logo text-xl sm:text-3xl self-end ss:self-auto hh:block hidden">
           <span className="text-orange-700">{"<"}L</span>arry
           <span className="text-orange-700">C</span>odes
           <span className="text-orange-700">{"/>"}</span>
