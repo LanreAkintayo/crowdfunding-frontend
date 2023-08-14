@@ -19,7 +19,7 @@ export const ToastModal = ({
   message,
 }) => {
   return (
-    <div className="rounded-md items-center font-sans">
+    <div className="flex rounded-md items-center font-sans">
       {status == 'success' && (
         <img src="/success.png" width={34} height={34} />
       )}

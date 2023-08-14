@@ -16,9 +16,11 @@ import { trackPromise, usePromiseTracker } from "react-promise-tracker";
 import Footer from "../components/Footer";
 import Backers from "../components/Backers";
 import { toWei, fromWei, tokenToAddress } from "../utils/helper";
-import { displayToast } from "../components/Toast";
+// import { displayToast } from "../components/Toast";
 import { getProjectInfo } from "../lib/fetchProjectInfo";
 import Layout from "./layout";
+import ModalSuccess from "../components/ModalSuccess";
+import ModalFailure from "../components/ModalFailure";
 // import { getAllProjects } from "../lib/projects";
 
 const supportedTokens = [
@@ -99,6 +101,15 @@ const PageInfo = ({ projectInfo }) => {
 
   const [pledgeText, setPledgeText] = useState("Pledge");
   const [isPledging, setIsPledging] = useState(false);
+
+  const [successMessage, setSuccessMessage] = useState("");
+  const [failureMessage, setFailureMessage] = useState("");
+  const [transactionHash, setTransactionHash] = useState("");
+
+  const handleCloseModal = () => {
+    setSuccessMessage("");
+    setFailureMessage("");
+  };
 
   const [projectData, setProjectData] = useState({
     ...projectInfo,
@@ -383,18 +394,14 @@ const PageInfo = ({ projectInfo }) => {
 
   const handleSuccess = async (tx) => {
     console.log("Success transaction: ", tx);
-    await trackPromise(tx.wait(1));
+    const txReceipt = await trackPromise(tx.wait(1));
     setPledgeText("Pledge");
     setIsPledging(false);
     setSupportModalOpen(false);
 
-    displayToast("success", "Pledging has completed");
-    // dispatch({
-    //   type: "success",
-    //   message: "Pledging Completed!",
-    //   title: "Transaction Notification",
-    //   position: "topR",
-    // });
+    // displayToast("success", "Pledging has completed");
+    setSuccessMessage("Pledging has completed");
+    setTransactionHash(txReceipt.transactionHash);
 
     await fetchProjectInfo();
   };
@@ -417,7 +424,8 @@ const PageInfo = ({ projectInfo }) => {
     setPledgeText("Pledge");
     setIsPledging(false);
 
-    displayToast("failure", "Failed to pledge");
+    // displayToast("failure", "Failed to pledge");
+    setFailureMessage("Failed to pledge");
     // dispatch({
     //   type: "error",
     //   message: "Pledging Failed",
@@ -783,8 +791,8 @@ const PageInfo = ({ projectInfo }) => {
         </div>
       </section>
 
-      {supportModalOpen && (
-        <div className="flex justify-center text-center sm:block sm:p-0 mt-2 scrollbar-hide">
+      <div className="flex justify-center text-center sm:block sm:p-0 mt-2 scrollbar-hide">
+        {supportModalOpen && (
           <SupportModal
             handleCloseSupportModal={handleCloseSupportModal}
             handleSelectToken={handleSelectToken}
@@ -798,12 +806,25 @@ const PageInfo = ({ projectInfo }) => {
             isPledging={isPledging}
             pledgeText={pledgeText}
           />
-        </div>
-      )}
+        )}
+        {successMessage && (
+          <ModalSuccess
+            message={successMessage}
+            transactionHash={transactionHash}
+            closeModal={handleCloseModal}
+          />
+        )}
 
+        {failureMessage && (
+          <ModalFailure
+            message={failureMessage}
+            closeModal={handleCloseModal}
+          />
+        )}
+      </div>
     </>
   );
-}
+};
 
 export async function getServerSideProps(context) {
   const query = context.query;

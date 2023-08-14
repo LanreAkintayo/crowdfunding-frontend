@@ -12,8 +12,10 @@ import { usePromiseTracker, trackPromise } from "react-promise-tracker";
 import { now, now2, sDuration } from "../utils/helper";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { displayToast } from "../components/Toast";
+// import { displayToast } from "../components/Toast";
 import Layout from "./layout";
+import ModalSuccess from "../components/ModalSuccess";
+import ModalFailure from "../components/ModalFailure";
 // import DatePicker from "sassy-datepicker";
 
 /* Create an instance of the client */
@@ -56,6 +58,9 @@ const Launch = () => {
 
   const chainId = parseInt(chainIdHex);
   const [currentUrl, setCurrentUrl] = useState("");
+  const [successMessage, setSuccessMessage] = useState("")
+  const [failureMessage, setFailureMessage] = useState("")
+  const [transactionHash, setTransactionHash] = useState("")
 
   const length = contractAddresses[chainId]?.length;
   const crowdfundAddress =
@@ -266,12 +271,17 @@ const Launch = () => {
   // Probably could add some error handling
   const handleSuccess = async (tx) => {
     console.log("Success transaction: ", tx);
-    await trackPromise(tx.wait(1));
+    const txReceipt= await trackPromise(tx.wait(1));
     // updateUIValues()
     setLaunchText("Publish Your Project");
     setIsLaunching(false);
 
-    displayToast("success", "Project has been launched successfully");
+    console.log("TransactionReceipt: ", txReceipt)
+
+    // displayToast("success", "Project has been launched successfully");
+    setSuccessMessage("Project has been launched")
+    setTransactionHash(txReceipt.transactionHash);
+    // setTransactionHash()
     // dispatch({
     //   type: "success",
     //   message: "Transaction Completed!",
@@ -285,7 +295,8 @@ const Launch = () => {
     setLaunchText("Publish Your Project");
     setIsLaunching(false);
 
-    displayToast("failure", "Failed to launch Project");
+    // displayToast("failure", "Failed to launch Project");
+    setFailureMessage("Failed to launch project")
 
     // dispatch({
     //   type: "error",
@@ -294,6 +305,11 @@ const Launch = () => {
     //   position: "topR",
     // });
   };
+
+  const handleCloseModal = () => {
+    setSuccessMessage("");
+    setFailureMessage("")
+  }
 
   return (
     <>
@@ -580,10 +596,26 @@ const Launch = () => {
           )}
         </button>
       </section>
+
+      <div className="flex justify-center text-center sm:block sm:p-0 mt-2">
+        {successMessage && (
+          <ModalSuccess
+            message={successMessage}
+            transactionHash={transactionHash}
+            closeModal={handleCloseModal}
+          />
+        )}
+        
+        {failureMessage && (
+          <ModalFailure
+            message={failureMessage}
+            closeModal={handleCloseModal}
+          />
+        )}
+      </div>
     </>
   );
-}
-
+};
 
 Launch.getLayout = function getLayout(page) {
   return <Layout>{page}</Layout>;
