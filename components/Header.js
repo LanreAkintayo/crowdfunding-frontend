@@ -59,7 +59,7 @@ export default function Header() {
   };
 
   return (
-    <div className={`ss:${chainId != 97 ? "h-30" : "h-20"} h-30`}>
+    <div className={`ss:${chainId != 97 ? "h-30" : "h-20"} h-30 w-screen`}>
       {/* Navbar */}
        {/* <button
         onClick={async () => {
@@ -121,7 +121,7 @@ export default function Header() {
       )}
 
       <nav className="flex items-center flex-col ss:flex-row w-full justify-between px-2 py-2 sm:px-4 sm:py-4 h-full text-white bg-zinc-800 ">
-        <p className="font-logo text-xl sm:text-3xl self-start ss:self-auto">
+        <p className="font-logo text-xl sm:text-3xl self-start ss:self-auto ss:block hidden">
           <span className="text-orange-700">{"<"}L</span>arry
           <span className="text-orange-700">C</span>odes
           <span className="text-orange-700">{"/>"}</span>
