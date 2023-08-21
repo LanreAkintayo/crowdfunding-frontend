@@ -7,11 +7,9 @@ import NavigationDropdown from "./NavigationDropdown";
 import { useEffect, useState, useCallback } from "react";
 import { useMoralis, useWeb3Contract, useChain } from "react-moralis";
 import { abi } from "../constants";
-import { BigNumber, ethers } from 'ethers';
-import { useRouter } from 'next/router';
+import { BigNumber, ethers } from "ethers";
+import { useRouter } from "next/router";
 import { FaBars, FaTimes } from "react-icons/fa";
-
-
 
 const useMediaQuery = (width) => {
   const [targetReached, setTargetReached] = useState(false);
@@ -61,7 +59,6 @@ export default function Header() {
   return (
     <div className={`ss:${chainId != 97 ? "h-30" : "h-20"} h-30 `}>
       {/* Navbar */}
-     
 
       {!collapsed && isBreakpoint && (
         <div className={`z-50 h-screen ${!collapsed && "fixed inset-0"}`}>
@@ -75,28 +72,41 @@ export default function Header() {
               className="px-4 pt-4 w-full flex justify-end text-end cursor-pointer text-xl"
               onClick={handleSidebar}
             >
-              <FaTimes/>
+              <FaTimes />
             </div>
             <Menu iconShape="square">
               <div className="text-xl text-white hover:text-green-700">
                 <MenuItem>
-                <Link href="/">
-                  <p className={`text-white font-semibold ${currentUrl == "/" && "border-b-2 border-orange-700"} hover:text-orange-500 sm:text-xl text-lg`}>
-                    Home
-                  </p>
-                </Link>
+                  <Link href="/">
+                    <p
+                      className={`text-white font-semibold ${
+                        currentUrl == "/" && "border-b-2 border-orange-700"
+                      } hover:text-orange-500 sm:text-xl text-lg`}
+                    >
+                      Home
+                    </p>
+                  </Link>
                 </MenuItem>
               </div>
               <MenuItem>
-              <Link href="/projects">
-                  <p className={`text-white ${currentUrl == "/projects" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg`}>
+                <Link href="/projects">
+                  <p
+                    className={`text-white ${
+                      currentUrl == "/projects" &&
+                      "border-b-2 border-orange-700"
+                    } font-semibold hover:text-orange-500 text-lg`}
+                  >
                     Projects
                   </p>
                 </Link>
               </MenuItem>
               <MenuItem>
-              <Link href="/launch">
-                  <p className={`w-full text-white ${currentUrl == "/launch" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg `}>
+                <Link href="/launch">
+                  <p
+                    className={`w-full text-white ${
+                      currentUrl == "/launch" && "border-b-2 border-orange-700"
+                    } font-semibold hover:text-orange-500 text-lg `}
+                  >
                     Get Funded
                   </p>
                 </Link>
@@ -106,29 +116,49 @@ export default function Header() {
         </div>
       )}
 
-      <nav className="flex items-end flex-row w-full justify-end hh:justify-between px-2 py-2 sm:px-4 sm:py-4 h-full text-white bg-zinc-800 ">
-        <p className="font-logo text-xl sm:text-3xl self-end ss:self-auto hh:block hidden">
-          <span className="text-orange-700">{"<"}L</span>arry
-          <span className="text-orange-700">C</span>odes
-          <span className="text-orange-700">{"/>"}</span>
-        </p>
+      <nav className="flex  items-end flex-row w-full justify-between hh:justify-between hh:items-center px-2 py-2 sm:px-4 sm:py-4 h-full text-white bg-zinc-800 ">
+        <img
+          src="./my_logo.svg"
+          width={200}
+          height={30}
+          className="object-cover p-0 lt:block hidden"
+        />
+        <img
+          src="./my_icon.svg"
+          width={40}
+          height={10}
+          className="object-cover p-0 lt:hidden block"
+        />
         <div className="flex items-center justify-end self-end ss:self-auto">
           <div className="flex justify-between items-center text-lg ">
             {!isBreakpoint && (
               <>
                 <Link href="/">
-                  <a className={`text-white font-semibold ${currentUrl == "/" && "border-b-2 border-orange-700"} hover:text-orange-500 sm:text-xl text-lg`}>
+                  <a
+                    className={`text-white font-semibold ${
+                      currentUrl == "/" && "border-b-2 border-orange-700"
+                    } hover:text-orange-500 sm:text-xl text-lg`}
+                  >
                     Home
                   </a>
                 </Link>
                 <Link href="/projects">
-                  <a className={`sm:ml-8 ml-6 text-white ${currentUrl == "/projects" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 text-lg`}>
+                  <a
+                    className={`sm:ml-8 ml-6 text-white ${
+                      currentUrl == "/projects" &&
+                      "border-b-2 border-orange-700"
+                    } font-semibold hover:text-orange-500 text-lg`}
+                  >
                     Projects
                   </a>
                 </Link>
 
                 <Link href="/launch">
-                  <a className={`sm:mx-4 mx-2 w-full text-white ${currentUrl == "/launch" && "border-b-2 border-orange-700"} font-semibold hover:text-orange-500 `}>
+                  <a
+                    className={`sm:mx-4 mx-2 w-full text-white ${
+                      currentUrl == "/launch" && "border-b-2 border-orange-700"
+                    } font-semibold hover:text-orange-500 `}
+                  >
                     Get Funded
                   </a>
                 </Link>
@@ -163,7 +193,7 @@ export default function Header() {
                   className="object-cover w-full h-full cursor-pointer hover:text-green-500"
                 /> */}
 
-<FaBars className="mr-3 w-9 h-9 bg-orange-100 rounded-full text-orange-800 p-2"/>
+                <FaBars className="mr-3 w-9 h-9 bg-orange-100 rounded-full text-orange-800 p-2" />
               </div>
             )}
           </div>
